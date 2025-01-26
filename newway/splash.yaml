@@ -1,0 +1,11 @@
+flutter_native_splash:
+  android: true
+  ios: true
+  web: false
+
+  color: "#181818"
+  image: lib/images/Rectangle 1.png
+
+  android_12:
+    color: "#181818"
+    image: lib/images/Rectangle 1.png
