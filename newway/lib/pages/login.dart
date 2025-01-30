@@ -4,7 +4,7 @@ import 'package:newway/components/auth_tile.dart';
 import 'package:newway/components/button.dart';
 import 'package:newway/components/colors.dart';
 import 'package:newway/components/textfield.dart';
-import 'package:newway/pages/intropage.dart';
+import 'package:newway/pages/bottom_nav_bar.dart';
 
 class Login extends StatefulWidget {
   Login({super.key});
@@ -38,7 +38,7 @@ class _LoginState extends State<Login> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Intropage()),
+          MaterialPageRoute(builder: (context) => BottomNavBar()),
         );
       }
     } catch (e) {

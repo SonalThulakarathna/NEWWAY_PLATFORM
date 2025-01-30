@@ -4,8 +4,8 @@ flutter_native_splash:
   web: false
 
   color: "#181818"
-  image: lib/images/Rectangle 1.png
+  image: lib/images/lettern.png
 
   android_12:
     color: "#181818"
-    image: lib/images/Rectangle 1.png
+    image: lib/images/lettern.png
