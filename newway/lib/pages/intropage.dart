@@ -26,14 +26,18 @@ class _IntropageState extends State<Intropage> {
     Cardcontent(
         title: 'RRRR',
         subtitle: 'aaaaaaa',
-        author: 'Randeniya',
+        author: 'Nehri',
         imagepath: 'lib/images/google.png',
         members: '100',
-        price: '500.00'),
+        price: '700.00'),
   ];
   void navigatetodetailspage(int index) {
     Navigator.push(
-        context, MaterialPageRoute(builder: (context) => Moredetails()));
+        context,
+        MaterialPageRoute(
+            builder: (context) => Moredetails(
+                  cc: Carddata[index],
+                )));
   }
 
   //final List<Widget> _contentCards = List.generate(6, (index) => ContentCard());
@@ -69,18 +73,6 @@ class _IntropageState extends State<Intropage> {
               ),
             ),
           ),
-          /*Expanded(
-            child: ListView.separated(
-              physics: const BouncingScrollPhysics(),
-              padding: const EdgeInsets.only(bottom: 20),
-              itemCount: _contentCards.length,
-              separatorBuilder: (context, index) => const SizedBox(height: 15),
-              itemBuilder: (context, index) => Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 15),
-                child: _contentCards[index],
-              ),
-            ),
-          ),*/
           Expanded(
               child: ListView.builder(
                   itemCount: Carddata.length,
