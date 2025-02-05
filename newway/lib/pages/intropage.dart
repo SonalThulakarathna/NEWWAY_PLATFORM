@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:newway/classes/card_data.dart';
+import 'package:newway/classes/cardcontentDB.dart';
 import 'package:newway/components/colors.dart';
 import 'package:newway/components/content_card.dart';
 import 'package:newway/components/filter_chip.dart';
@@ -15,32 +16,15 @@ class Intropage extends StatefulWidget {
 }
 
 class _IntropageState extends State<Intropage> {
-  final Carddata = [
-    Cardcontent(
-        title: 'RRRR',
-        subtitle: 'aaaaaaa',
-        author: 'Randeniya',
-        imagepath: 'lib/images/google.png',
-        members: '100',
-        price: '500.00'),
-    Cardcontent(
-        title: 'RRRR',
-        subtitle: 'aaaaaaa',
-        author: 'Nehri',
-        imagepath: 'lib/images/google.png',
-        members: '100',
-        price: '700.00'),
-  ];
-  void navigatetodetailspage(int index) {
+  final carddb = Cardcontentdb();
+
+  void navigatetodetailspage(Cardcontent card) {
     Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => Moredetails(
-                  cc: Carddata[index],
-                )));
+      context,
+      MaterialPageRoute(builder: (context) => Moredetails(cc: card)),
+    );
   }
 
-  //final List<Widget> _contentCards = List.generate(6, (index) => ContentCard());
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -50,18 +34,17 @@ class _IntropageState extends State<Intropage> {
         children: [
           MainAppbar(),
           const SizedBox(height: 16),
+
+          // Filter Chips
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 15),
             child: SizedBox(
-              height: 50, // Set a fixed height for the horizontal list
+              height: 50,
               child: ListView.separated(
-                scrollDirection:
-                    Axis.horizontal, // Make the list scroll horizontally
-                itemCount: 4, // Number of chips
-                separatorBuilder: (context, index) =>
-                    const SizedBox(width: 8), // Add spacing between chips
+                scrollDirection: Axis.horizontal,
+                itemCount: 4,
+                separatorBuilder: (context, index) => const SizedBox(width: 8),
                 itemBuilder: (context, index) {
-                  // Define the text for each chip
                   final List<String> chipLabels = [
                     "Leadership",
                     "Corporate",
@@ -73,13 +56,37 @@ class _IntropageState extends State<Intropage> {
               ),
             ),
           ),
+
+          const SizedBox(height: 10),
+
+          // FutureBuilder to Fetch Data
           Expanded(
-              child: ListView.builder(
-                  itemCount: Carddata.length,
-                  itemBuilder: (context, index) => ContentCard(
-                        card: Carddata[index],
-                        onTap: () => navigatetodetailspage(index),
-                      )))
+            child: FutureBuilder<List<Cardcontent>>(
+              future: carddb.getCardContents(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
+                if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                  return const Center(child: Text('No cards found.'));
+                }
+
+                final cards = snapshot.data!;
+                return ListView.builder(
+                  itemCount: cards.length,
+                  itemBuilder: (context, index) {
+                    return ContentCard(
+                      card: cards[index],
+                      onTap: () => navigatetodetailspage(cards[index]),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
         ],
       ),
     );

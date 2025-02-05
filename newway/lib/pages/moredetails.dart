@@ -27,7 +27,7 @@ class _MoredetailsState extends State<Moredetails> {
             Expanded(
                 child: ListView(
               children: [
-                //Image.asset(''),
+                //Image.asset(widget.cc.imagepath),
                 const SizedBox(
                   height: 25,
                 ),
@@ -38,20 +38,43 @@ class _MoredetailsState extends State<Moredetails> {
                       children: [
                         Row(
                           children: [
-                            Icon(
-                              Icons.lock,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(
-                              width: 10,
-                            ),
-                            Text(
-                              widget.cc.price,
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 17,
-                                  fontWeight: FontWeight.bold),
-                            )
+                            widget.cc.condition
+                                ? Row(
+                                    children: [
+                                      Icon(
+                                        Icons.lock,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        'Private',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold),
+                                      )
+                                    ],
+                                  )
+                                : Row(
+                                    children: [
+                                      Icon(
+                                        Icons.done,
+                                        color: Colors.white,
+                                      ),
+                                      const SizedBox(
+                                        width: 10,
+                                      ),
+                                      Text(
+                                        'Public',
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontSize: 17,
+                                            fontWeight: FontWeight.bold),
+                                      )
+                                    ],
+                                  )
                           ],
                         ),
                         const SizedBox(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:newway/components/colors.dart';
 import 'package:newway/pages/chat_page.dart';
+import 'package:newway/pages/favourite_page.dart';
 import 'package:newway/pages/intropage.dart';
+import 'package:newway/pages/profile_page.dart';
 
 class BottomNavBar extends StatefulWidget {
   const BottomNavBar({
@@ -23,6 +25,8 @@ class _BottomNavBarState extends State<BottomNavBar> {
   final List<Widget> pages = [
     Intropage(),
     ChatPage(),
+    FavouritePage(),
+    ProfilePage()
   ];
 
   @override
