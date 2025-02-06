@@ -113,9 +113,12 @@ class _LoginState extends State<Login> {
             const SizedBox(
               height: 25,
             ),
-            Button(
-              text: "Sign in",
-              onTap: usersignin,
+            Container(
+              margin: const EdgeInsets.symmetric(horizontal: 20),
+              child: Button(
+                text: "Sign in",
+                onTap: usersignin,
+              ),
             ),
             const SizedBox(
               height: 50,

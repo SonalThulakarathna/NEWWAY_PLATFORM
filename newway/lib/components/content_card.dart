@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:newway/classes/card_data.dart';
+import 'package:newway/components/colors.dart';
 
 class ContentCard extends StatelessWidget {
   final Cardcontent card;
   final void Function()? onTap;
+
   const ContentCard({super.key, required this.card, required this.onTap});
 
   @override
@@ -12,50 +14,25 @@ class ContentCard extends StatelessWidget {
       onTap: onTap,
       child: Card(
         margin: const EdgeInsets.all(16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 4, // Adds subtle shadow for better UI
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    card.title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.grey[800],
-                    ),
-                  ),
-                  Text(
-                    "56GAMBUS",
-                    style: TextStyle(
-                      fontSize: 16,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
+              Image(
+                image: _getImageProvider('lib/images/anime.jpg'),
+                fit: BoxFit.cover,
               ),
+
               const SizedBox(height: 12),
 
-              // Progress Section
-              Text(
-                "6-21/31",
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.blue[800],
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 4),
-              LinearProgressIndicator(
-                value: 6 / 21,
-                backgroundColor: Colors.grey[200],
-                color: Colors.blue[600],
-                minHeight: 6,
-              ),
+              // Progress Section (Example: Dynamic Values)
+
               const SizedBox(height: 16),
 
               // Coach Section
@@ -64,7 +41,9 @@ class ContentCard extends StatelessWidget {
                 children: [
                   CircleAvatar(
                     radius: 24,
-                    backgroundImage: NetworkImage(card.imagepath),
+                    backgroundImage: _getImageProvider(card.imagepath),
+                    onBackgroundImageError: (_, __) =>
+                        const Icon(Icons.error, color: Colors.red),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -78,6 +57,7 @@ class ContentCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             color: Colors.grey[900],
                           ),
+                          overflow: TextOverflow.ellipsis, // Prevents overflow
                         ),
                         const SizedBox(height: 4),
                         Text(
@@ -103,19 +83,48 @@ class ContentCard extends StatelessWidget {
                 children: [
                   Row(
                     children: [
-                      Icon(Icons.lock_outline,
-                          size: 16, color: Colors.grey[600]),
                       const SizedBox(width: 4),
-                      Text(
-                        "Private",
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.grey[600],
-                        ),
-                      ),
+                      card.condition
+                          ? Row(
+                              children: [
+                                Icon(
+                                  Icons.lock,
+                                  color: textfieldgrey,
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  'Private',
+                                  style: TextStyle(
+                                    color: textfieldgrey,
+                                    fontSize: 15,
+                                  ),
+                                )
+                              ],
+                            )
+                          : Row(
+                              children: [
+                                Icon(
+                                  Icons.done,
+                                  color: textfieldgrey,
+                                ),
+                                const SizedBox(
+                                  width: 10,
+                                ),
+                                Text(
+                                  'Public',
+                                  style: TextStyle(
+                                    color: textfieldgrey,
+                                    fontSize: 15,
+                                  ),
+                                )
+                              ],
+                            ), // Empty widget if condition is false
+
                       const SizedBox(width: 12),
                       Text(
-                        card.members,
+                        "${card.members} Members",
                         style: TextStyle(
                           fontSize: 14,
                           color: Colors.grey[600],
@@ -124,7 +133,7 @@ class ContentCard extends StatelessWidget {
                     ],
                   ),
                   Text(
-                    card.price,
+                    "\$${card.price}",
                     style: TextStyle(
                       fontSize: 16,
                       color: Colors.blue[800],
@@ -138,5 +147,14 @@ class ContentCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  // Function to Handle Image Source (Local vs Network)
+  ImageProvider _getImageProvider(String imagePath) {
+    if (imagePath.startsWith('http') || imagePath.startsWith('https')) {
+      return NetworkImage(imagePath);
+    } else {
+      return AssetImage(imagePath); // For local assets
+    }
   }
 }
