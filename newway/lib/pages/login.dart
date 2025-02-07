@@ -7,7 +7,7 @@ import 'package:newway/components/textfield.dart';
 import 'package:newway/pages/bottom_nav_bar.dart';
 
 class Login extends StatefulWidget {
-  Login({super.key});
+  const Login({super.key});
 
   @override
   State<Login> createState() => _LoginState();
@@ -38,7 +38,7 @@ class _LoginState extends State<Login> {
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => BottomNavBar()),
+          MaterialPageRoute(builder: (context) => const BottomNavBar()),
         );
       }
     } catch (e) {
@@ -73,8 +73,8 @@ class _LoginState extends State<Login> {
             ),
             const SizedBox(height: 25),
             //text
-            Text(
-              "Welcome back you\'ve been missed",
+            const Text(
+              "Welcome back you've been missed",
               style: TextStyle(
                 color: Colors.white,
                 fontSize: 18,
@@ -98,8 +98,8 @@ class _LoginState extends State<Login> {
             const SizedBox(
               height: 10,
             ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
+            const Padding(
+              padding: EdgeInsets.symmetric(horizontal: 25),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
@@ -150,11 +150,11 @@ class _LoginState extends State<Login> {
             const SizedBox(
               height: 50,
             ),
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Atile(path: 'lib/images/google.png'),
-                const SizedBox(
+                SizedBox(
                   width: 25,
                 ),
                 Atile(path: 'lib/images/apple.png')
@@ -164,14 +164,14 @@ class _LoginState extends State<Login> {
               height: 50,
             ),
 
-            Row(
+            const Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
                   "Not a member?",
                   style: TextStyle(color: Colors.white, fontSize: 15),
                 ),
-                const SizedBox(
+                SizedBox(
                   width: 5,
                 ),
                 Text("Register now",

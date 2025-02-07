@@ -39,13 +39,13 @@ class _MoredetailsState extends State<Moredetails> {
                         Row(
                           children: [
                             widget.cc.condition
-                                ? Row(
+                                ? const Row(
                                     children: [
                                       Icon(
                                         Icons.lock,
                                         color: Colors.white,
                                       ),
-                                      const SizedBox(
+                                      SizedBox(
                                         width: 10,
                                       ),
                                       Text(
@@ -57,13 +57,13 @@ class _MoredetailsState extends State<Moredetails> {
                                       )
                                     ],
                                   )
-                                : Row(
+                                : const Row(
                                     children: [
                                       Icon(
                                         Icons.done,
                                         color: Colors.white,
                                       ),
-                                      const SizedBox(
+                                      SizedBox(
                                         width: 10,
                                       ),
                                       Text(
@@ -82,7 +82,7 @@ class _MoredetailsState extends State<Moredetails> {
                         ),
                         Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.people,
                               color: Colors.white,
                             ),
@@ -91,7 +91,7 @@ class _MoredetailsState extends State<Moredetails> {
                             ),
                             Text(
                               widget.cc.price,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold),
@@ -104,7 +104,7 @@ class _MoredetailsState extends State<Moredetails> {
                       children: [
                         Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.label,
                               color: Colors.white,
                             ),
@@ -113,7 +113,7 @@ class _MoredetailsState extends State<Moredetails> {
                             ),
                             Text(
                               widget.cc.price,
-                              style: TextStyle(
+                              style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold),
@@ -125,7 +125,7 @@ class _MoredetailsState extends State<Moredetails> {
                         ),
                         Row(
                           children: [
-                            Icon(
+                            const Icon(
                               Icons.person,
                               color: Colors.white,
                             ),
@@ -133,8 +133,8 @@ class _MoredetailsState extends State<Moredetails> {
                               width: 10,
                             ),
                             Text(
-                              'By ' + widget.cc.author,
-                              style: TextStyle(
+                              'By ${widget.cc.author}',
+                              style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold),
@@ -149,14 +149,14 @@ class _MoredetailsState extends State<Moredetails> {
                   height: 45,
                 ),
                 Button(
-                  text: 'Join funnel / ' + widget.cc.price,
+                  text: 'Join funnel / ${widget.cc.price}',
                   onTap: () {},
                 ),
                 const SizedBox(
                   height: 55,
                 ),
                 Container(
-                  child: Text(
+                  child: const Text(
                     'Experience personalized fitness guidance with Ares Perera, a certified personal trainer dedicated to helping you achieve your unique fitness goals.',
                     style: TextStyle(color: Colors.white, fontSize: 17),
                   ),
@@ -165,7 +165,7 @@ class _MoredetailsState extends State<Moredetails> {
                   height: 25,
                 ),
                 Container(
-                    child: Text(
+                    child: const Text(
                   '1-on-1 Personal Training: Tailored workouts and personalized attention to help you reach your peak performance.',
                   style: TextStyle(color: Colors.white, fontSize: 17),
                 )),
@@ -173,7 +173,7 @@ class _MoredetailsState extends State<Moredetails> {
                   height: 25,
                 ),
                 Container(
-                    child: Text(
+                    child: const Text(
                   'Online Training: Customized workout plans, nutrition guidance, and ongoing support to fit your busy schedule',
                   style: TextStyle(color: Colors.white, fontSize: 17),
                 )),

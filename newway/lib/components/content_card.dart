@@ -18,6 +18,7 @@ class ContentCard extends StatelessWidget {
           borderRadius: BorderRadius.circular(12),
         ),
         elevation: 4, // Adds subtle shadow for better UI
+        color: Color(0xFF383838),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -25,7 +26,7 @@ class ContentCard extends StatelessWidget {
             children: [
               // Header Row
               Image(
-                image: _getImageProvider('lib/images/anime.jpg'),
+                image: _getImageProvider('lib/images/hq720.jpg'),
                 fit: BoxFit.cover,
               ),
 
@@ -55,7 +56,7 @@ class ContentCard extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.bold,
-                            color: Colors.grey[900],
+                            color: Colors.white,
                           ),
                           overflow: TextOverflow.ellipsis, // Prevents overflow
                         ),
@@ -85,37 +86,37 @@ class ContentCard extends StatelessWidget {
                     children: [
                       const SizedBox(width: 4),
                       card.condition
-                          ? Row(
+                          ? const Row(
                               children: [
                                 Icon(
                                   Icons.lock,
                                   color: textfieldgrey,
                                 ),
-                                const SizedBox(
+                                SizedBox(
                                   width: 10,
                                 ),
                                 Text(
                                   'Private',
                                   style: TextStyle(
-                                    color: textfieldgrey,
+                                    color: Colors.white,
                                     fontSize: 15,
                                   ),
                                 )
                               ],
                             )
-                          : Row(
+                          : const Row(
                               children: [
                                 Icon(
                                   Icons.done,
-                                  color: textfieldgrey,
+                                  color: Colors.white,
                                 ),
-                                const SizedBox(
+                                SizedBox(
                                   width: 10,
                                 ),
                                 Text(
                                   'Public',
                                   style: TextStyle(
-                                    color: textfieldgrey,
+                                    color: Colors.white,
                                     fontSize: 15,
                                   ),
                                 )
@@ -127,7 +128,7 @@ class ContentCard extends StatelessWidget {
                         "${card.members} Members",
                         style: TextStyle(
                           fontSize: 14,
-                          color: Colors.grey[600],
+                          color: Colors.white,
                         ),
                       ),
                     ],
@@ -136,7 +137,7 @@ class ContentCard extends StatelessWidget {
                     "\$${card.price}",
                     style: TextStyle(
                       fontSize: 16,
-                      color: Colors.blue[800],
+                      color: Colors.white,
                       fontWeight: FontWeight.bold,
                     ),
                   ),

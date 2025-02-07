@@ -21,11 +21,11 @@ class Textfield extends StatelessWidget {
           obscureText: obscuretext,
           decoration: InputDecoration(
               enabledBorder: const OutlineInputBorder(),
-              focusedBorder: OutlineInputBorder(),
+              focusedBorder: const OutlineInputBorder(),
               fillColor: textfieldgrey,
               filled: true,
               hintText: hinttext,
-              hintStyle: TextStyle(color: Colors.grey)),
+              hintStyle: const TextStyle(color: Colors.grey)),
         ),
       ),
     );

@@ -31,7 +31,7 @@ class _SidebarState extends State<Sidebar> {
                       color: Colors.white,
                     )),
                 hintText: "Search your funnel",
-                hintStyle: TextStyle(color: Colors.grey),
+                hintStyle: const TextStyle(color: Colors.grey),
                 border: InputBorder.none),
           ),
           const SizedBox(
@@ -42,7 +42,7 @@ class _SidebarState extends State<Sidebar> {
               "lib/images/Plus.png",
               height: 36,
             ),
-            title: Text(
+            title: const Text(
               "Create Funnel",
               style: TextStyle(color: Colors.white),
             ),
@@ -56,7 +56,7 @@ class _SidebarState extends State<Sidebar> {
               "lib/images/Plus.png",
               height: 36,
             ),
-            title: Text(
+            title: const Text(
               "Discover Funnel",
               style: TextStyle(color: Colors.white),
             ),

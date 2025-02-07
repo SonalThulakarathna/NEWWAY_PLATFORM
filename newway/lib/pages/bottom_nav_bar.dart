@@ -23,10 +23,10 @@ class _BottomNavBarState extends State<BottomNavBar> {
   }
 
   final List<Widget> pages = [
-    Intropage(),
-    ChatPage(),
-    FavouritePage(),
-    ProfilePage()
+    const Intropage(),
+    const ChatPage(),
+    const FavouritePage(),
+    const ProfilePage()
   ];
 
   @override
@@ -41,7 +41,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         elevation: 0,
         onTap: navigate,
         type: BottomNavigationBarType.fixed,
-        items: [
+        items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
           BottomNavigationBarItem(

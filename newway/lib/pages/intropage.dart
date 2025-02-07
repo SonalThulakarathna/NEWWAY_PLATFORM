@@ -32,7 +32,7 @@ class _IntropageState extends State<Intropage> {
       backgroundColor: primary,
       body: Column(
         children: [
-          MainAppbar(),
+          const MainAppbar(),
           const SizedBox(height: 16),
 
           // Filter Chips

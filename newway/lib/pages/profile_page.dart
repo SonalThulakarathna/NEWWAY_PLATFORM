@@ -25,7 +25,7 @@ class _ProfilePageState extends State<ProfilePage> {
       body: SingleChildScrollView(
         child: Center(
           child: Container(
-            padding: EdgeInsets.all(20),
+            padding: const EdgeInsets.all(20),
             child: Column(
               children: [
                 const SizedBox(
@@ -46,14 +46,14 @@ class _ProfilePageState extends State<ProfilePage> {
                 const SizedBox(
                   height: 17,
                 ),
-                Text(
+                const Text(
                   'Selina Rogert',
                   style: TextStyle(
                       fontSize: 30,
                       color: Colors.white,
                       fontWeight: FontWeight.bold),
                 ),
-                Text(
+                const Text(
                   'Photographer',
                   style: TextStyle(
                     fontSize: 20,

@@ -15,20 +15,20 @@ class MainAppbar extends StatelessWidget {
       actions: [
         IconButton(
           onPressed: () {},
-          icon: Icon(Icons.notifications),
+          icon: const Icon(Icons.notifications),
           iconSize: 28,
-          style: ButtonStyle(
+          style: const ButtonStyle(
               foregroundColor: WidgetStatePropertyAll(
             Colors.white,
           )),
         ),
         IconButton(
           onPressed: () => Navigator.of(context).push(MaterialPageRoute(
-            builder: (context) => SearchPage(),
+            builder: (context) => const SearchPage(),
           )),
-          icon: Icon(Icons.search),
+          icon: const Icon(Icons.search),
           iconSize: 28,
-          style: ButtonStyle(
+          style: const ButtonStyle(
               foregroundColor: WidgetStatePropertyAll(Colors.white)),
         ),
       ],
@@ -37,10 +37,10 @@ class MainAppbar extends StatelessWidget {
         onPressed: () {
           Scaffold.of(context).openDrawer();
         },
-        icon: Icon(Icons.menu),
+        icon: const Icon(Icons.menu),
         iconSize: 28,
-        style:
-            ButtonStyle(foregroundColor: WidgetStatePropertyAll(Colors.white)),
+        style: const ButtonStyle(
+            foregroundColor: WidgetStatePropertyAll(Colors.white)),
       ),
     );
   }

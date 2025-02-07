@@ -17,7 +17,7 @@ class _FchipState extends State<Fchip> {
       label: Text(widget.text),
       selected: isselected,
       backgroundColor: buttoncolor,
-      labelStyle: TextStyle(color: Colors.white),
+      labelStyle: const TextStyle(color: Colors.white),
       onSelected: (bool value) {
         setState(() {
           isselected = !isselected;
