@@ -17,11 +17,12 @@ class FunnelInsideTabbar extends StatelessWidget {
           backgroundColor: primary,
           iconTheme: const IconThemeData(color: Colors.white),
           title: Text(
-            '${card.author} funnel', // ✅ Fixed string concatenation
+            '${card.author} funnel',
             style: const TextStyle(fontSize: 20, color: Colors.white),
           ),
           bottom: const TabBar(
-            isScrollable: true, // ✅ Enables horizontal scrolling
+            isScrollable: true,
+            indicatorColor: Colors.transparent,
             tabs: [
               Tab(
                 child: Text(
@@ -62,13 +63,18 @@ class FunnelInsideTabbar extends StatelessWidget {
             ],
           ),
         ),
-        body: const TabBarView(
-          children: [
-            Center(child: FunnelCources()),
-            Center(child: Text('Meetings Content')),
-            Center(child: Text('Community Content')),
-            Center(child: Text('Members Content')),
-          ],
+        body: Expanded(
+          child: TabBarView(
+            children: [
+              Center(
+                  child: FunnelCources(
+                card: card,
+              )),
+              Center(child: Text('Meetings Content')),
+              Center(child: Text('Community Content')),
+              Center(child: Text('Members Content')),
+            ],
+          ),
         ),
       ),
     );
