@@ -38,6 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   google_fonts:
   flutter_native_splash: ^2.4.4
+  supabase: ^2.6.2
 
 dev_dependencies:
   flutter_test:

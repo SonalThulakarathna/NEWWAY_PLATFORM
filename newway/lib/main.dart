@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:newway/pages/login.dart';
+import 'package:newway/pages/signin.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -18,9 +18,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Login(),
+      home: SignUp(),
     );
   }
 }
