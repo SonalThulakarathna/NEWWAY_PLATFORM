@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:newway/classes/card_data.dart';
 import 'package:newway/components/button.dart';
+import 'package:newway/components/carousel.dart';
 import 'package:newway/components/colors.dart';
+import 'package:newway/pages/funnel%20pages/funnel_inside_tabbar.dart';
 
 class Moredetails extends StatefulWidget {
   final Cardcontent cc;
@@ -12,6 +14,13 @@ class Moredetails extends StatefulWidget {
 }
 
 class _MoredetailsState extends State<Moredetails> {
+  void funnelinside(Cardcontent card) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => FunnelInsideTabbar(card: card)),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -27,9 +36,9 @@ class _MoredetailsState extends State<Moredetails> {
             Expanded(
                 child: ListView(
               children: [
-                //Image.asset(widget.cc.imagepath),
+                Carousel(),
                 const SizedBox(
-                  height: 25,
+                  height: 35,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -150,7 +159,7 @@ class _MoredetailsState extends State<Moredetails> {
                 ),
                 Button(
                   text: 'Join funnel / ' + widget.cc.price,
-                  onTap: () {},
+                  onTap: () => funnelinside(widget.cc),
                 ),
                 const SizedBox(
                   height: 55,
