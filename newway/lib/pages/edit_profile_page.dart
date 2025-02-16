@@ -42,7 +42,7 @@ class EditProfilePage extends StatelessWidget {
                     child: Container(
                       decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20)),
-                      child: const Text(
+                      child: Text(
                         'Change pic',
                         style: TextStyle(fontSize: 18),
                       ),
