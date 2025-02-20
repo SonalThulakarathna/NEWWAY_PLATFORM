@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:newway/components/colors.dart';
+import 'package:newway/pages/funnel%20pages/createfunnel_page.dart';
 
 class Sidebar extends StatefulWidget {
   const Sidebar({super.key});
@@ -42,9 +43,17 @@ class _SidebarState extends State<Sidebar> {
               "lib/images/Plus.png",
               height: 36,
             ),
-            title: Text(
-              "Create Funnel",
-              style: TextStyle(color: Colors.white),
+            title: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreatefunnelPage()),
+                );
+              },
+              child: Text(
+                "Create Funnel",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             onTap: () {},
           ),

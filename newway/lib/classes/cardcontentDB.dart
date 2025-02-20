@@ -9,10 +9,8 @@ class Cardcontentdb {
     try {
       final response = await _supabase.from('newwayfunnelinfo').select('''
           *, 
-          newwayfunnelinfoimage!newwayfunnelinfo_userimageid_fkey (imageurl)  // Explicit join
+          newwayfunnelinfoimage!newwayfunnelinfo_userimageid_fkey (imageurl) 
         ''');
-
-      print("✅ Supabase Response: $response"); // Debugging print
 
       // ignore: unnecessary_null_comparison
       if (response == null || response.isEmpty) {
@@ -37,11 +35,7 @@ class Cardcontentdb {
           imagepath: item['imagepath'] ?? '',
           members: item['members']?.toString() ?? '0',
           price: item['price']?.toString() ?? '0',
-          userimageid: item['userimageid'] is int
-              ? item['userimageid']
-              : int.tryParse(item['userimageid'].toString()) ?? 0,
-          userimageurl:
-              userImageUrl, // Use the fallback URL if no image is found
+          userimageurl: item['funnelimageurl'] ?? '',
         );
       }).toList();
     } catch (e) {
