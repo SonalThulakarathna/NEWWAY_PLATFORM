@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:newway/auth/auth_email.dart';
+import 'package:newway/classes/authservice.dart';
 import 'package:newway/components/auth_tile.dart';
 import 'package:newway/components/button.dart';
 import 'package:newway/components/colors.dart';
 import 'package:newway/components/textfield.dart';
 import 'package:newway/pages/bottom_nav_bar.dart';
+import 'package:newway/pages/registerpage.dart';
 
 class Login extends StatefulWidget {
   Login({super.key});
@@ -15,12 +16,12 @@ class Login extends StatefulWidget {
 
 class _LoginState extends State<Login> {
   final username = TextEditingController();
-  final authservice = Authservise();
+  final authservice = Authservicelog();
   final password = TextEditingController();
 
   void usersignin() async {
-    final email = username.text;
-    final pass = password.text;
+    //final email = username.text;
+    //final pass = password.text;
 
     /*try {
       await authservice.emailpass(email, pass);
@@ -32,7 +33,7 @@ class _LoginState extends State<Login> {
     }*/
 
     try {
-      await authservice.emailpass(email, pass);
+      //await authservice.emailpass(email, pass);
 
       // If login is successful, navigate to the home page
       if (mounted) {
@@ -46,6 +47,23 @@ class _LoginState extends State<Login> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error: $e')),
         );
+      }
+    }
+  }
+
+  void login() async {
+    final email = username.text;
+    final pass = password.text;
+    try {
+      await authservice.signinemailpass(email, pass);
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const BottomNavBar()),
+      );
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('error: $e')));
       }
     }
   }
@@ -118,7 +136,7 @@ class _LoginState extends State<Login> {
                 margin: const EdgeInsets.symmetric(horizontal: 20),
                 child: Button(
                   text: "Sign in",
-                  onTap: usersignin,
+                  onTap: login,
                 ),
               ),
               const SizedBox(
@@ -175,8 +193,15 @@ class _LoginState extends State<Login> {
                   const SizedBox(
                     width: 5,
                   ),
-                  Text("Register now",
-                      style: TextStyle(color: Colors.blue, fontSize: 15)),
+                  GestureDetector(
+                    onTap: () => Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const Registerpage(),
+                        )),
+                    child: Text("Register now",
+                        style: TextStyle(color: Colors.blue, fontSize: 15)),
+                  ),
                 ],
               )
             ],

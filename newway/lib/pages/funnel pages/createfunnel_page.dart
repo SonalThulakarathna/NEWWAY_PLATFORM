@@ -1,8 +1,7 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:newway/classes/userdata.dart';
-import 'package:newway/classes/userdataDB.dart';
+import 'package:newway/classes/authservice.dart';
 import 'package:newway/components/button.dart';
 import 'package:newway/components/colors.dart';
 import 'package:newway/components/textfield.dart';
@@ -24,7 +23,8 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
   final TextEditingController funnelprice = TextEditingController();
   File? _imagefile;
   final supabase = Supabase.instance.client;
-  final Userdatadb _userdatadb = Userdatadb();
+
+  final Authservicelog authservice = Authservicelog();
 
   Future pickimage() async {
     final ImagePicker picker = ImagePicker();
@@ -40,22 +40,64 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
   final List<String> items = ['private', 'public'];
   String? selecteditem = 'public';
 
-  Future haveafunnel() async {
-    final Userdata? userData = await _userdatadb.getFunnelId();
-    if (userData != null && userData.funnelid != 0) {
+  Future<void> haveafunnel() async {
+    try {
+      final Session? session = supabase.auth.currentSession;
+      if (session == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('User is not logged in')),
+        );
+        return;
+      }
+      if (creatorname.text.isEmpty ||
+          creatorsalutation.text.isEmpty ||
+          funneldescription.text.isEmpty ||
+          (selecteditem == 'private' && funnelprice.text.isEmpty)) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please fill all required fields')),
+        );
+        return;
+      }
+
+      if (_imagefile == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select an image')),
+        );
+        return;
+      }
+
+      final filename = DateTime.now().microsecondsSinceEpoch.toString();
+      final path = 'uploads/$filename';
+
+      await supabase.storage
+          .from('newwayfunnelbanner')
+          .upload(path, _imagefile!);
+      final String imageUrl =
+          supabase.storage.from('newwayfunnelbanner').getPublicUrl(path);
+
+      final response = await supabase.from('newwayfunnelinfo').insert({
+        'name': creatorname.text,
+        'salutation': creatorsalutation.text,
+        'summaray': funneldescription.text,
+        'condition': selecteditem,
+        'price': selecteditem == 'private' && funnelprice.text.isNotEmpty
+            ? double.parse(funnelprice.text)
+            : 0.0,
+        'funnelimageurl': imageUrl,
+        'userid': authservice.getuserid(),
+      }).select('id');
+
+      if (response.isEmpty) throw Exception('Insert failed');
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('You already have a funnel!')),
+        SnackBar(content: Text('Funnel created successfully! ')),
       );
-      return;
-    }
-    if (creatorname.text.isEmpty ||
-        creatorsalutation.text.isEmpty ||
-        funneldescription.text.isEmpty ||
-        funnelprice.text.isEmpty) {
+
+      Navigator.pop(context);
+    } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill all required fields')),
+        SnackBar(content: Text('Error creating funnel: ${e.toString()}')),
       );
-      return;
     }
   }
 
@@ -72,7 +114,7 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Center(
+            /*Center(
               child: Container(
                 width: 100,
                 height: 100,
@@ -80,8 +122,8 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
                   backgroundImage: AssetImage('lib/images/lettern.png'),
                 ),
               ),
-            ),
-            const SizedBox(height: 25),
+            ),*/
+            const SizedBox(height: 15),
             Center(
               child: Text(
                 'Create Funnel',
@@ -220,17 +262,14 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
                   )
                 : SizedBox(),
             const SizedBox(
-              height: 45,
+              height: 25,
             ),
             Padding(
-              padding: const EdgeInsets.all(25.0),
+              padding: const EdgeInsets.all(20.0),
               child: Button(
-                text: 'Create Funnel',
-                onTap: () {},
+                text: 'Get started',
+                onTap: haveafunnel,
               ),
-            ),
-            const SizedBox(
-              height: 30,
             )
           ],
         ),

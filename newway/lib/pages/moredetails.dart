@@ -47,43 +47,44 @@ class _MoredetailsState extends State<Moredetails> {
                       children: [
                         Row(
                           children: [
-                            widget.cc.condition
-                                ? Row(
-                                    children: [
-                                      Icon(
-                                        Icons.lock,
+                            if (widget.cc.condition == 'private')
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.lock,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    'Private',
+                                    style: TextStyle(
                                         color: Colors.white,
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        'Private',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.bold),
-                                      )
-                                    ],
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold),
                                   )
-                                : Row(
-                                    children: [
-                                      Icon(
-                                        Icons.done,
+                                ],
+                              )
+                            else
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.done,
+                                    color: Colors.white,
+                                  ),
+                                  const SizedBox(
+                                    width: 10,
+                                  ),
+                                  Text(
+                                    'Public',
+                                    style: TextStyle(
                                         color: Colors.white,
-                                      ),
-                                      const SizedBox(
-                                        width: 10,
-                                      ),
-                                      Text(
-                                        'Public',
-                                        style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 17,
-                                            fontWeight: FontWeight.bold),
-                                      )
-                                    ],
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold),
                                   )
+                                ],
+                              )
                           ],
                         ),
                         const SizedBox(
@@ -164,26 +165,12 @@ class _MoredetailsState extends State<Moredetails> {
                 const SizedBox(
                   height: 55,
                 ),
-                Container(
-                  child: Text(
-                    'Experience personalized fitness guidance with Ares Perera, a certified personal trainer dedicated to helping you achieve your unique fitness goals.',
-                    style: TextStyle(color: Colors.white, fontSize: 17),
-                  ),
-                ),
                 const SizedBox(
                   height: 25,
                 ),
                 Container(
                     child: Text(
-                  '1-on-1 Personal Training: Tailored workouts and personalized attention to help you reach your peak performance.',
-                  style: TextStyle(color: Colors.white, fontSize: 17),
-                )),
-                const SizedBox(
-                  height: 25,
-                ),
-                Container(
-                    child: Text(
-                  'Online Training: Customized workout plans, nutrition guidance, and ongoing support to fit your busy schedule',
+                  widget.cc.subtitle,
                   style: TextStyle(color: Colors.white, fontSize: 17),
                 )),
               ],

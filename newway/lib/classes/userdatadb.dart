@@ -27,4 +27,13 @@ class Userdatadb {
     final funnelid = response['funnelidnum'] as int?;
     return funnelid != null ? Userdata(funnelid: funnelid) : null;
   }
+
+  Future<void> updateFunnelId(int funnelId) async {
+    final user = _supabase.auth.currentUser;
+    if (user == null) throw Exception('User not logged in');
+
+    await _supabase
+        .from('newwayusers')
+        .update({'funnelidnum': funnelId}).eq('id', user.id);
+  }
 }

@@ -5,7 +5,7 @@ class Cardcontent {
   String imagepath;
   String members;
   String price;
-  bool condition;
+  String condition;
   String userimageurl;
 
   Cardcontent(

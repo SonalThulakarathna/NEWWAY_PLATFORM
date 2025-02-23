@@ -7,39 +7,39 @@ class Cardcontentdb {
   // Fetch data from Supabase
   Future<List<Cardcontent>> getCardContents() async {
     try {
-      final response = await _supabase.from('newwayfunnelinfo').select('''
-          *, 
-          newwayfunnelinfoimage!newwayfunnelinfo_userimageid_fkey (imageurl) 
-        ''');
+      print("🏁 Fetching data from newwayfunnelinfo...");
 
-      // ignore: unnecessary_null_comparison
-      if (response == null || response.isEmpty) {
-        print("🚨 No data found from Supabase!");
+      // Fetch all columns from newwayfunnelinfo
+      final response = await _supabase
+          .from('newwayfunnelinfo')
+          .select('*')
+          .order('created_at', ascending: false); // Sort by newest first
+
+      if (response.isEmpty) {
+        print("⚠️ No data found in newwayfunnelinfo table");
         return [];
       }
 
-      return response.map((item) {
-        final userImages =
-            item['newwayfunnelinfoimage'] as List<dynamic>? ?? [];
-        final userImageUrl = userImages.isNotEmpty
-            ? userImages[0]['imageurl']
-            : 'lib/images/anime.jpg'; // Fallback to a default image URL if null
+      print("✅ Fetched ${response.length} records");
 
-        print("🖼 Image URL: $userImageUrl"); // Debugging print
+      // Map response to Cardcontent objects
+      return response.map((item) {
+        print("🖼 Processing item: ${item['id']}");
 
         return Cardcontent(
-          title: item['salutation'] ?? '',
-          subtitle: item['summaray'] ?? '',
-          author: item['name'] ?? '',
-          condition: item['condition'] ?? '',
-          imagepath: item['imagepath'] ?? '',
+          title: item['salutation']?.toString() ?? 'No Salutation',
+          subtitle: item['summaray']?.toString() ?? 'No Summary',
+          author: item['name']?.toString() ?? 'Anonymous',
+          condition: item['condition']?.toString() ?? 'public',
+          imagepath: item['imagepath']?.toString() ?? 'lib/images/default.jpg',
           members: item['members']?.toString() ?? '0',
           price: item['price']?.toString() ?? '0',
-          userimageurl: item['funnelimageurl'] ?? '',
+          userimageurl:
+              item['funnelimageurl']?.toString() ?? 'lib/images/default.jpg',
         );
       }).toList();
     } catch (e) {
-      print("❌ Error fetching data: $e");
+      print("🛑 Error fetching data: ${e.toString()}");
       return [];
     }
   }
