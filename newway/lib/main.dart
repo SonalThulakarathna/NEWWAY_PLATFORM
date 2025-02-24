@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:newway/pages/login.dart';
+import 'package:newway/classes/authgate.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 void main() async {
@@ -20,7 +20,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: Login(),
+      home: Authgate(),
     );
   }
 }

@@ -5,8 +5,7 @@ class Cardcontent {
   String imagepath;
   String members;
   String price;
-  bool condition;
-  int userimageid;
+  String condition;
   String userimageurl;
 
   Cardcontent(
@@ -17,6 +16,5 @@ class Cardcontent {
       required this.members,
       required this.price,
       required this.condition,
-      required this.userimageid,
       required this.userimageurl});
 }

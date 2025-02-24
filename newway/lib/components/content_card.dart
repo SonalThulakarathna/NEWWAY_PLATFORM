@@ -25,11 +25,10 @@ class ContentCard extends StatelessWidget {
             children: [
               // Header Row
               Image(
+                height: 180,
                 image: _getImageProvider(card.userimageurl),
                 fit: BoxFit.cover,
               ),
-
-              const SizedBox(height: 12),
 
               Padding(
                 padding: const EdgeInsets.all(16.0),
@@ -75,7 +74,7 @@ class ContentCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 12),
 
                       // Footer Row
                       Row(
@@ -84,43 +83,44 @@ class ContentCard extends StatelessWidget {
                           Row(
                             children: [
                               const SizedBox(width: 4),
-                              card.condition
-                                  ? Row(
-                                      children: [
-                                        Icon(
-                                          Icons.lock,
-                                          color: textfieldgrey,
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          'Private',
-                                          style: TextStyle(
-                                            color: textfieldgrey,
-                                            fontSize: 15,
-                                          ),
-                                        )
-                                      ],
+                              if (card.condition == 'private')
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.lock,
+                                      color: textfieldgrey,
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      'Private',
+                                      style: TextStyle(
+                                        color: textfieldgrey,
+                                        fontSize: 15,
+                                      ),
                                     )
-                                  : Row(
-                                      children: [
-                                        Icon(
-                                          Icons.done,
-                                          color: textfieldgrey,
-                                        ),
-                                        const SizedBox(
-                                          width: 10,
-                                        ),
-                                        Text(
-                                          'Public',
-                                          style: TextStyle(
-                                            color: textfieldgrey,
-                                            fontSize: 15,
-                                          ),
-                                        )
-                                      ],
-                                    ), // Empty widget if condition is false
+                                  ],
+                                )
+                              else
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.done,
+                                      color: textfieldgrey,
+                                    ),
+                                    const SizedBox(
+                                      width: 10,
+                                    ),
+                                    Text(
+                                      'Public',
+                                      style: TextStyle(
+                                        color: textfieldgrey,
+                                        fontSize: 15,
+                                      ),
+                                    )
+                                  ],
+                                ), // Empty widget if condition is false
 
                               const SizedBox(width: 12),
                               Text(

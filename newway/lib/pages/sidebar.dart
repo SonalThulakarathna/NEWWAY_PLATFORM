@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:newway/classes/authservice.dart';
 import 'package:newway/components/colors.dart';
+import 'package:newway/pages/funnel%20pages/createfunnel_page.dart';
 
 class Sidebar extends StatefulWidget {
   const Sidebar({super.key});
@@ -9,6 +11,12 @@ class Sidebar extends StatefulWidget {
 }
 
 class _SidebarState extends State<Sidebar> {
+  final authservice = Authservicelog();
+
+  void logout() async {
+    await authservice.signout();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -42,9 +50,17 @@ class _SidebarState extends State<Sidebar> {
               "lib/images/Plus.png",
               height: 36,
             ),
-            title: Text(
-              "Create Funnel",
-              style: TextStyle(color: Colors.white),
+            title: GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CreatefunnelPage()),
+                );
+              },
+              child: Text(
+                "Create Funnel",
+                style: TextStyle(color: Colors.white),
+              ),
             ),
             onTap: () {},
           ),
@@ -61,6 +77,17 @@ class _SidebarState extends State<Sidebar> {
               style: TextStyle(color: Colors.white),
             ),
             onTap: () {},
+          ),
+          ListTile(
+            leading: Image.asset(
+              "lib/images/Plus.png",
+              height: 36,
+            ),
+            title: Text(
+              "Log out",
+              style: TextStyle(color: Colors.white),
+            ),
+            onTap: logout,
           ),
         ],
       ),
