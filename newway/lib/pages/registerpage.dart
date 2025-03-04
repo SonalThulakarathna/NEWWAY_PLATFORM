@@ -80,14 +80,14 @@ class _RegisterpageState extends State<Registerpage> {
               height: 25,
             ),
             Textfield(
-                controller: password, hinttext: 'Password', obscuretext: false),
+                controller: password, hinttext: 'Password', obscuretext: true),
             const SizedBox(
               height: 25,
             ),
             Textfield(
                 controller: repassword,
                 hinttext: 'Re enter password',
-                obscuretext: false),
+                obscuretext: true),
             const SizedBox(
               height: 55,
             ),

@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:newway/classes/authservice.dart';
 import 'package:newway/classes/card_data.dart';
 import 'package:newway/classes/cardcontentDB.dart';
 import 'package:newway/components/colors.dart';
 import 'package:newway/components/content_card.dart';
 import 'package:newway/components/filter_chip.dart';
 import 'package:newway/components/main_appbar.dart';
+import 'package:newway/pages/funnel%20pages/funnel_inside_tabbar.dart';
 import 'package:newway/pages/moredetails.dart';
 import 'package:newway/pages/sidebar.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Intropage extends StatefulWidget {
   const Intropage({super.key});
@@ -17,12 +20,39 @@ class Intropage extends StatefulWidget {
 
 class _IntropageState extends State<Intropage> {
   final carddb = Cardcontentdb();
+  final SupabaseClient supabase = Supabase.instance.client;
+  final auth = Authservicelog();
 
-  void navigatetodetailspage(Cardcontent card) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => Moredetails(cc: card)),
-    );
+  void navigatetodetailspage(Cardcontent card) async {
+    final cuserid = auth.getuserid().toString();
+    try {
+      final response = await supabase
+          .from('funnelmembers')
+          .select('id')
+          .eq('funnelid', card.id)
+          .eq('userid', cuserid)
+          .maybeSingle();
+
+      if (response != null) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => FunnelInsideTabbar(card: card)),
+        );
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => Moredetails(cc: card)),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("An error occurred. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override

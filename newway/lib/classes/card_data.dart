@@ -1,4 +1,6 @@
 class Cardcontent {
+  int id;
+  int funnelownerid;
   String title;
   String subtitle;
   String author;
@@ -10,6 +12,8 @@ class Cardcontent {
 
   Cardcontent(
       {required this.title,
+      required this.funnelownerid,
+      required this.id,
       required this.subtitle,
       required this.author,
       required this.imagepath,

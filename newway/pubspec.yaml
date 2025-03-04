@@ -41,6 +41,12 @@ dependencies:
   carousel_slider: ^5.0.0
   smooth_page_indicator: ^1.2.0+3
   image_picker: ^1.1.2
+  file_picker: ^9.0.0
+  video_player: ^2.9.3
+  chewie: ^1.10.0
+  flutter_vlc_player: ^7.4.2
+  appinio_video_player: ^1.2.2
+  uuid: ^4.5.1
 
 dev_dependencies:
   flutter_test:
