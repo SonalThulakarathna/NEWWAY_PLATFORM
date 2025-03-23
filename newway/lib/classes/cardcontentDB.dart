@@ -35,7 +35,9 @@ class Cardcontentdb {
           id: int.tryParse(item['id'].toString()) ?? 0,
           funnelownerid: int.tryParse(item['userid'].toString()) ?? 0,
           userimageurl:
-              item['funnelimageurl']?.toString() ?? 'lib/images/default.jpg',
+              item['funnelimageurl']?.toString() ?? 'lib/images/anime.jpg',
+          profileimageurl:
+              item['profileimageurl']?.toString() ?? 'lib/images/lettern.png',
         );
       }).toList();
     } catch (e) {

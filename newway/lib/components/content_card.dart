@@ -46,7 +46,7 @@ class ContentCard extends StatelessWidget {
                             CircleAvatar(
                               radius: 24,
                               backgroundImage:
-                                  _getImageProvider(card.imagepath),
+                                  _getImageProvider(card.profileimageurl),
                               onBackgroundImageError: (_, __) =>
                                   const Icon(Icons.error, color: Colors.red),
                             ),

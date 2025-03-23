@@ -1,5 +1,6 @@
 import 'package:appinio_video_player/appinio_video_player.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:newway/classes/card_data.dart';
 import 'package:newway/components/colors.dart';
 import 'package:newway/components/funnel_coverpage.dart';
@@ -86,7 +87,12 @@ class _FunnelCourcesState extends State<FunnelCources> {
           ),
           Expanded(
             child: isLoading
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(
+                    child: SizedBox(
+                    height: 250,
+                    child: Lottie.network(
+                        'https://lottie.host/d4649615-85f7-4ef1-81e3-c5015ed851d7/83V9j7MnW7.json'),
+                  ))
                 : videos.isEmpty
                     ? const Center(child: Text("No videos found."))
                     : ListView.builder(

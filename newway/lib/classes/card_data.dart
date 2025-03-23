@@ -9,6 +9,7 @@ class Cardcontent {
   String price;
   String condition;
   String userimageurl;
+  String profileimageurl;
 
   Cardcontent(
       {required this.title,
@@ -20,5 +21,6 @@ class Cardcontent {
       required this.members,
       required this.price,
       required this.condition,
-      required this.userimageurl});
+      required this.userimageurl,
+      required this.profileimageurl});
 }

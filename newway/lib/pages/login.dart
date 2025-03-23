@@ -3,6 +3,7 @@ import 'package:newway/classes/authservice.dart';
 import 'package:newway/components/auth_tile.dart';
 import 'package:newway/components/button.dart';
 import 'package:newway/components/colors.dart';
+import 'package:newway/components/loading_page1.dart';
 import 'package:newway/components/textfield.dart';
 import 'package:newway/pages/bottom_nav_bar.dart';
 import 'package:newway/pages/registerpage.dart';
@@ -18,28 +19,21 @@ class _LoginState extends State<Login> {
   final username = TextEditingController();
   final authservice = Authservicelog();
   final password = TextEditingController();
+  bool _isLoading = false; // Loading state variable
 
-  void usersignin() async {
-    //final email = username.text;
-    //final pass = password.text;
+  void login() async {
+    setState(() {
+      _isLoading = true; // Start loading
+    });
 
-    /*try {
-      await authservice.emailpass(email, pass);
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Error : $e')));
-      }
-    }*/
-
+    final email = username.text;
+    final pass = password.text;
     try {
-      //await authservice.emailpass(email, pass);
-
-      // If login is successful, navigate to the home page
+      await authservice.signinemailpass(email, pass);
       if (mounted) {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => BottomNavBar()),
+          MaterialPageRoute(builder: (context) => const BottomNavBar()),
         );
       }
     } catch (e) {
@@ -48,28 +42,20 @@ class _LoginState extends State<Login> {
           SnackBar(content: Text('Error: $e')),
         );
       }
-    }
-  }
-
-  void login() async {
-    final email = username.text;
-    final pass = password.text;
-    try {
-      await authservice.signinemailpass(email, pass);
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const BottomNavBar()),
-      );
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('error: $e')));
-      }
+    } finally {
+      setState(() {
+        _isLoading = false; // Stop loading
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    // Show LoadingPage1 if _isLoading is true
+    if (_isLoading) {
+      return const LoadingPage1();
+    }
+
     return Scaffold(
       backgroundColor: primary,
       body: Padding(
@@ -80,7 +66,7 @@ class _LoginState extends State<Login> {
               const SizedBox(
                 height: 25,
               ),
-              //image
+              // Image
               Center(
                 child: Padding(
                   padding: const EdgeInsets.all(50.0),
@@ -91,7 +77,7 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 25),
-              //text
+              // Text
               Text(
                 "Welcome back you\'ve been missed",
                 style: TextStyle(
@@ -100,7 +86,7 @@ class _LoginState extends State<Login> {
                 ),
               ),
               const SizedBox(height: 25),
-              //textares
+              // Text fields
               Textfield(
                 controller: username,
                 hinttext: 'Username',
@@ -182,7 +168,6 @@ class _LoginState extends State<Login> {
               const SizedBox(
                 height: 50,
               ),
-
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

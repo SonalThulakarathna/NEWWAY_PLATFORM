@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:newway/classes/authservice.dart';
 import 'package:newway/components/colors.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -64,7 +65,12 @@ class _FavouritePageState extends State<FavouritePage> {
     return Scaffold(
       backgroundColor: primary,
       body: isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? Center(
+              child: SizedBox(
+              height: 650,
+              child: Lottie.network(
+                  'https://lottie.host/d4649615-85f7-4ef1-81e3-c5015ed851d7/83V9j7MnW7.json'),
+            ))
           : funnelDetails.isEmpty
               ? const Center(
                   child: Text("No joined funnels found.",

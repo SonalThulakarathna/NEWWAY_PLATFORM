@@ -1,16 +1,16 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:lottie/lottie.dart';
 import 'package:newway/classes/authservice.dart';
 import 'package:newway/components/button.dart';
 import 'package:newway/components/colors.dart';
+import 'package:newway/components/loading_page1.dart';
 import 'package:newway/components/textfield.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class CreatefunnelPage extends StatefulWidget {
-  const CreatefunnelPage({
-    super.key,
-  });
+  const CreatefunnelPage({super.key});
 
   @override
   State<CreatefunnelPage> createState() => _CreatefunnelPageState();
@@ -21,61 +21,78 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
   final TextEditingController creatorsalutation = TextEditingController();
   final TextEditingController funneldescription = TextEditingController();
   final TextEditingController funnelprice = TextEditingController();
-  File? _imagefile;
-  final supabase = Supabase.instance.client;
 
+  File? _profileImage; // Creator Profile Image
+  File? _funnelImage; // Funnel Banner Image
+
+  final supabase = Supabase.instance.client;
+  bool _isLoading = false;
   final Authservicelog authservice = Authservicelog();
 
-  Future pickimage() async {
+  final List<String> items = ['private', 'public'];
+  String selecteditem = 'public';
+
+  Future<void> pickImage({required bool isProfile}) async {
     final ImagePicker picker = ImagePicker();
     final XFile? image = await picker.pickImage(source: ImageSource.gallery);
-
     if (image != null) {
       setState(() {
-        _imagefile = File(image.path);
+        if (isProfile) {
+          _profileImage = File(image.path);
+        } else {
+          _funnelImage = File(image.path);
+        }
       });
     }
   }
 
-  final List<String> items = ['private', 'public'];
-  String? selecteditem = 'public';
-
   Future<void> haveafunnel() async {
+    if (creatorname.text.isEmpty ||
+        creatorsalutation.text.isEmpty ||
+        funneldescription.text.isEmpty ||
+        (selecteditem == 'private' && funnelprice.text.isEmpty)) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill all required fields')),
+      );
+      return;
+    }
+
+    if (_profileImage == null || _funnelImage == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select both images')),
+      );
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    final cuser = authservice.getuserid().toString();
     try {
-      final Session? session = supabase.auth.currentSession;
-      if (session == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('User is not logged in')),
-        );
-        return;
-      }
-      if (creatorname.text.isEmpty ||
-          creatorsalutation.text.isEmpty ||
-          funneldescription.text.isEmpty ||
-          (selecteditem == 'private' && funnelprice.text.isEmpty)) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please fill all required fields')),
-        );
-        return;
-      }
-
-      if (_imagefile == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select an image')),
-        );
-        return;
-      }
-
+      // Upload profile image
       final filename = DateTime.now().microsecondsSinceEpoch.toString();
-      final path = 'uploads/$filename';
+      final profilePath = 'uploads/profile_$filename';
+      final funnelPath = 'uploads/funnel_$filename';
 
       await supabase.storage
-          .from('newwayfunnelbanner')
-          .upload(path, _imagefile!);
-      final String imageUrl =
-          supabase.storage.from('newwayfunnelbanner').getPublicUrl(path);
+          .from('newwayfunnelprofileimage')
+          .upload(profilePath, _profileImage!);
 
-      final response = await supabase.from('newwayfunnelinfo').insert({
+      // Upload funnel image
+      await supabase.storage
+          .from('newwayfunnelbanner')
+          .upload(funnelPath, _funnelImage!);
+
+      // Get public URLs for the uploaded images
+      final String profileImageUrl = supabase.storage
+          .from('newwayfunnelprofileimage')
+          .getPublicUrl(profilePath);
+      final String funnelImageUrl =
+          supabase.storage.from('newwayfunnelbanner').getPublicUrl(funnelPath);
+
+      // Insert funnel data into the database
+      await supabase.from('newwayfunnelinfo').insert({
         'name': creatorname.text,
         'salutation': creatorsalutation.text,
         'summaray': funneldescription.text,
@@ -83,26 +100,31 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
         'price': selecteditem == 'private' && funnelprice.text.isNotEmpty
             ? double.parse(funnelprice.text)
             : 0.0,
-        'funnelimageurl': imageUrl,
-        'userid': authservice.getuserid(),
-      }).select('id');
-
-      if (response.isEmpty) throw Exception('Insert failed');
+        'funnelimageurl': funnelImageUrl,
+        'profileimageurl': profileImageUrl,
+        'userid': cuser,
+      });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Funnel created successfully! ')),
+        const SnackBar(content: Text('Funnel created successfully!')),
       );
 
       Navigator.pop(context);
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error creating funnel: ${e.toString()}')),
+        SnackBar(content: Text('Error: ${e.toString()}')),
       );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) return const LoadingPage1();
+
     return Scaffold(
       backgroundColor: primary,
       appBar: AppBar(
@@ -111,113 +133,98 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 25),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            /*Center(
-              child: Container(
-                width: 100,
-                height: 100,
-                child: const CircleAvatar(
-                  backgroundImage: AssetImage('lib/images/lettern.png'),
-                ),
-              ),
-            ),*/
             const SizedBox(height: 15),
             Center(
-              child: Text(
-                'Create Funnel',
-                style: TextStyle(
-                  fontSize: 35,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
+              child: Text('Create Funnel',
+                  style: TextStyle(
+                      fontSize: 35,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white)),
+            ),
+            const SizedBox(height: 25),
+
+            // Profile Image Picker
+            Center(
+              child: GestureDetector(
+                onTap: () => pickImage(isProfile: true),
+                child: CircleAvatar(
+                  radius: 70,
+                  backgroundColor: textfieldgrey,
+                  backgroundImage:
+                      _profileImage != null ? FileImage(_profileImage!) : null,
+                  child: _profileImage == null
+                      ? const Icon(Icons.person, size: 50, color: Colors.white)
+                      : null,
                 ),
               ),
             ),
-            const SizedBox(height: 25),
+
+            const SizedBox(height: 20),
             Padding(
-              padding: const EdgeInsets.only(left: 25),
-              child: Text(
-                'Creator Name',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
+              padding: const EdgeInsets.only(left: 20),
+              child: Text('Creator Name',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
             ),
-            const SizedBox(height: 10),
             Textfield(
                 controller: creatorname,
                 hinttext: 'Ex: Ramindu Randeniya',
                 obscuretext: false),
             const SizedBox(height: 25),
+
             Padding(
-              padding: const EdgeInsets.only(left: 25),
-              child: Text(
-                'Creator Salutation',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
+              padding: const EdgeInsets.only(left: 20),
+              child: Text('Creator Salutation',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
             ),
-            const SizedBox(height: 10),
             Textfield(
                 controller: creatorsalutation,
                 hinttext: 'Ex: Doctor/Fitness Coach',
                 obscuretext: false),
             const SizedBox(height: 25),
+
             Padding(
-              padding: const EdgeInsets.only(left: 25),
-              child: Text(
-                'Funnel Description',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
+              padding: const EdgeInsets.only(left: 20),
+              child: Text('Funnel Description',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
             ),
-            const SizedBox(height: 10),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: TextFormField(
-                minLines: 1,
-                maxLines: 5,
+            Textfield(
                 controller: funneldescription,
-                keyboardType: TextInputType.multiline,
-                decoration: InputDecoration(
-                  enabledBorder: const OutlineInputBorder(),
-                  focusedBorder: const OutlineInputBorder(),
-                  fillColor: textfieldgrey,
-                  filled: true,
-                  hintText: 'About your funnel',
-                  hintStyle: TextStyle(color: Colors.grey),
-                ),
-              ),
-            ),
-            const SizedBox(height: 50),
+                hinttext: 'About your funnel',
+                obscuretext: false),
+            const SizedBox(height: 25),
+
+            // Funnel Image Picker
             Center(
               child: GestureDetector(
-                onTap: pickimage,
+                onTap: () => pickImage(isProfile: false),
                 child: Container(
-                  width: 350,
+                  width: 290,
                   height: 150,
-                  decoration: BoxDecoration(color: textfieldgrey),
-                  child: _imagefile != null
-                      ? Image.file(
-                          _imagefile!,
-                          fit: BoxFit.cover,
-                        )
+                  decoration: BoxDecoration(
+                    color: textfieldgrey,
+                  ),
+                  child: _funnelImage != null
+                      ? Image.file(_funnelImage!, fit: BoxFit.cover)
                       : const Center(
-                          child: Text(
-                            'Nothing selected',
-                            style: TextStyle(color: Colors.white, fontSize: 18),
-                          ),
-                        ),
+                          child: Text('Select Funnel Image',
+                              style: TextStyle(
+                                  color: Colors.white, fontSize: 18))),
                 ),
               ),
             ),
             const SizedBox(height: 35),
+
             Padding(
-              padding: const EdgeInsets.only(left: 25),
-              child: Text(
-                'Funnel status',
-                style: TextStyle(color: Colors.white, fontSize: 18),
-              ),
+              padding: const EdgeInsets.only(left: 20),
+              child: Text('Funnel Status',
+                  style: TextStyle(color: Colors.white, fontSize: 18)),
             ),
             const SizedBox(
-              height: 10,
+              height: 18,
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 25),
@@ -228,7 +235,7 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
                 style: TextStyle(fontSize: 20, color: Colors.white),
                 onChanged: (String? item) {
                   setState(() {
-                    selecteditem = item;
+                    selecteditem = item!;
                   });
                 },
                 items: items.map((String item) {
@@ -242,34 +249,31 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
             const SizedBox(
               height: 25,
             ),
-            selecteditem == 'private'
-                ? Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 25),
-                    child: TextFormField(
-                      minLines: 1,
-                      maxLines: 5,
-                      controller: funnelprice,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        enabledBorder: const OutlineInputBorder(),
-                        focusedBorder: const OutlineInputBorder(),
-                        fillColor: textfieldgrey,
-                        filled: true,
-                        hintText: 'Funnel membership price',
-                        hintStyle: TextStyle(color: Colors.grey),
-                      ),
-                    ),
-                  )
-                : SizedBox(),
+
+            if (selecteditem == 'private')
+              Textfield(
+                  controller: funnelprice,
+                  hinttext: 'Funnel membership price',
+                  obscuretext: false),
+
+            const SizedBox(height: 25),
+            Center(
+              child: Container(
+                height: 150,
+                child: Lottie.network(
+                    'https://lottie.host/3e6a5802-ee93-4884-9e17-cd42b8d69246/L4YPZ6x8FX.json'),
+              ),
+            ),
             const SizedBox(
               height: 25,
             ),
             Padding(
-              padding: const EdgeInsets.all(20.0),
-              child: Button(
-                text: 'Get started',
-                onTap: haveafunnel,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: 10),
+              child: Button(text: 'Get Started', onTap: haveafunnel),
+            ),
+
+            const SizedBox(
+              height: 30,
             )
           ],
         ),

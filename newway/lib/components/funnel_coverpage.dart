@@ -62,6 +62,6 @@ class FunnelCoverpage extends StatelessWidget {
   Widget buildProfileImage() => CircleAvatar(
         radius: profileHeight / 2,
         backgroundColor: Colors.grey.shade800,
-        backgroundImage: AssetImage('lib/images/lettern.png'),
+        backgroundImage: AssetImage(card.profileimageurl),
       );
 }
