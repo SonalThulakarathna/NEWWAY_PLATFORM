@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:newway/classes/authservice.dart';
-import 'package:newway/components/colors.dart';
 import 'package:newway/pages/funnel%20pages/createfunnel_page.dart';
 
 class Sidebar extends StatefulWidget {
@@ -23,7 +22,7 @@ class _SidebarState extends State<Sidebar> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: primary,
+      backgroundColor: Color(0xFF1E1E2E),
       child: Column(
         children: [
           Expanded(

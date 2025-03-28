@@ -24,6 +24,7 @@ class _FunnelvideoUploadpageState extends State<FunnelvideoUploadpage> {
   Uint8List? fileBytes;
   String? fileName;
   final Authservicelog authservice = Authservicelog();
+  bool isUploading = false;
 
   Future<void> pickvideo() async {
     try {
@@ -50,6 +51,10 @@ class _FunnelvideoUploadpageState extends State<FunnelvideoUploadpage> {
       );
       return;
     }
+
+    setState(() {
+      isUploading = true;
+    });
 
     try {
       await supabase.storage
@@ -96,6 +101,10 @@ class _FunnelvideoUploadpageState extends State<FunnelvideoUploadpage> {
           backgroundColor: Colors.red,
         ),
       );
+    } finally {
+      setState(() {
+        isUploading = false;
+      });
     }
   }
 
@@ -103,44 +112,375 @@ class _FunnelvideoUploadpageState extends State<FunnelvideoUploadpage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: primary,
-      body: Column(
-        children: [
-          const SizedBox(height: 30),
-          Center(
-            child: GestureDetector(
-              onTap: pickvideo,
-              child: Container(
-                width: 350,
-                height: 150,
-                decoration: BoxDecoration(color: textfieldgrey),
-                child: videoFile != null
-                    ? Center(
-                        child: Text('Video Selected: ${videoFile!.name}',
-                            style: const TextStyle(color: Colors.white)))
-                    : const Center(
-                        child: Text(
-                          'Tap to select a video',
-                          style: TextStyle(color: Colors.white, fontSize: 18),
+      appBar: AppBar(
+        backgroundColor: primary,
+        elevation: 0,
+        title: const Text(
+          'Upload Video',
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header section
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: buttoncolor.withOpacity(0.3),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Icon(
+                        Icons.video_library_outlined,
+                        color: Colors.white,
+                        size: 24,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            'Add Video to Your Funnel',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            'Upload videos to share with your audience',
+                            style: TextStyle(
+                              color: Colors.white.withOpacity(0.7),
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Video selection section
+              const Padding(
+                padding: EdgeInsets.only(left: 12, bottom: 12),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.movie_creation_outlined,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'Select Video',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              GestureDetector(
+                onTap: pickvideo,
+                child: Container(
+                  width: double.infinity,
+                  height: 180,
+                  decoration: BoxDecoration(
+                    color: textfieldgrey.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.1),
+                      width: 1,
+                    ),
+                  ),
+                  child: videoFile != null
+                      ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: buttoncolor.withOpacity(0.2),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.check_circle_outline,
+                                color: Colors.white,
+                                size: 40,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Video Selected:',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 14,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 20),
+                              child: Text(
+                                videoFile!.name,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                textAlign: TextAlign.center,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            TextButton.icon(
+                              onPressed: pickvideo,
+                              icon: const Icon(
+                                Icons.refresh,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                              label: const Text(
+                                'Change Video',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.white.withOpacity(0.1),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.1),
+                                shape: BoxShape.circle,
+                              ),
+                              child: const Icon(
+                                Icons.video_call_outlined,
+                                color: Colors.white,
+                                size: 40,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            const Text(
+                              'Tap to select a video',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              'MP4, MOV, or AVI formats supported',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.6),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
                         ),
+                ),
+              ),
+
+              const SizedBox(height: 30),
+
+              // Video description section
+              const Padding(
+                padding: EdgeInsets.only(left: 12, bottom: 12),
+                child: Row(
+                  children: [
+                    Icon(
+                      Icons.description_outlined,
+                      color: Colors.white,
+                      size: 18,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      'Video Description',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              Textfield(
+                controller: funnelvideoabt,
+                hinttext: 'What this video is about',
+                obscuretext: false,
+              ),
+
+              const SizedBox(height: 40),
+
+              // Upload button
+              Container(
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  boxShadow: [
+                    BoxShadow(
+                      color: buttoncolor.withOpacity(0.4),
+                      blurRadius: 15,
+                      offset: const Offset(0, 5),
+                      spreadRadius: -5,
+                    ),
+                  ],
+                ),
+                child: isUploading
+                    ? Container(
+                        height: 55,
+                        decoration: BoxDecoration(
+                          color: buttoncolor.withOpacity(0.7),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        child: const Center(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 2,
+                                ),
+                              ),
+                              SizedBox(width: 12),
+                              Text(
+                                'Uploading...',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      )
+                    : Button(
+                        text: 'Upload Video',
+                        onTap: uploadVideo,
                       ),
               ),
+
+              const SizedBox(height: 20),
+
+              // Tips section
+              if (!isUploading)
+                Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.1),
+                      width: 1,
+                    ),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Row(
+                        children: [
+                          Icon(
+                            Icons.lightbulb_outline,
+                            color: Colors.amber,
+                            size: 18,
+                          ),
+                          SizedBox(width: 8),
+                          Text(
+                            'Tips for Better Videos',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      _buildTipItem(
+                          'Keep videos under 10 minutes for better engagement'),
+                      _buildTipItem(
+                          'Add a clear description to help viewers understand the content'),
+                      _buildTipItem(
+                          'Use good lighting and clear audio for professional results'),
+                    ],
+                  ),
+                ),
+
+              const SizedBox(height: 30),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTipItem(String text) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '•',
+            style: TextStyle(
+              color: Colors.white.withOpacity(0.7),
+              fontSize: 14,
+              fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(
-            height: 28,
-          ),
-          Textfield(
-              controller: funnelvideoabt,
-              hinttext: 'What this video about',
-              obscuretext: false),
-          const SizedBox(
-            height: 45,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 25),
-            child: Button(
-              text: 'Upload',
-              onTap: uploadVideo,
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              text,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.7),
+                fontSize: 13,
+              ),
             ),
           ),
         ],

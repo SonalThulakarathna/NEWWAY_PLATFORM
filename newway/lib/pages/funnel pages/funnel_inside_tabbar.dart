@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:newway/classes/card_data.dart';
-import 'package:newway/components/colors.dart';
 import 'package:newway/pages/funnel%20pages/funnel_cources.dart';
 
 class FunnelInsideTabbar extends StatelessWidget {
@@ -12,9 +11,9 @@ class FunnelInsideTabbar extends StatelessWidget {
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        backgroundColor: primary,
+        backgroundColor: Color(0xFF1E1E2E),
         appBar: AppBar(
-          backgroundColor: primary,
+          backgroundColor: Color(0xFF1E1E2E),
           iconTheme: const IconThemeData(color: Colors.white),
           title: Text(
             '${card.author} funnel',

@@ -3,7 +3,6 @@ import 'package:newway/classes/authservice.dart';
 import 'package:newway/classes/card_data.dart';
 import 'package:newway/components/button.dart';
 import 'package:newway/components/carousel.dart';
-import 'package:newway/components/colors.dart';
 import 'package:newway/pages/funnel%20pages/funnel_inside_tabbar.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -50,7 +49,7 @@ class _MoredetailsState extends State<Moredetails> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primary,
+      backgroundColor: Color(0xFF1E1E2E),
       appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
