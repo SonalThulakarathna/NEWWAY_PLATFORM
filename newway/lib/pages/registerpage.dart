@@ -15,22 +15,43 @@ class _RegisterpageState extends State<Registerpage> {
   final authservice = Authservicelog();
   final supabase = Supabase.instance.client;
   final email = TextEditingController();
+  final name = TextEditingController();
   final password = TextEditingController();
   final repassword = TextEditingController();
 
   void signup() async {
-    final signemail = email.text;
-    final signpass = password.text;
+    final signemail = email.text.trim();
+    final signpass = password.text.trim();
+    final fullname = name.text.trim();
+    final signrepass = repassword.text.trim();
 
-    final signrepass = repassword.text;
+    if (signemail.isEmpty || signpass.isEmpty || fullname.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('All fields are required')));
+      return;
+    }
 
     if (signpass != signrepass) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Password dosent match')));
+          .showSnackBar(SnackBar(content: Text("Passwords don't match")));
       return;
     }
+
     try {
-      await authservice.signupemailpass(signemail, signrepass);
+      await authservice.signupemailpass(signemail, signpass);
+
+      final uid = await authservice.getuserid();
+      if (uid == null) throw Exception("User ID is null");
+
+      final response = await supabase.from('newwayusers').insert({
+        'full_name':
+            fullname, // Ensure it matches your Supabase table column name
+        'auth_id': uid,
+        'email': signemail
+      }).select(); // This helps check if the insertion was successful
+
+      print("Insert Response: $response");
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Login()),
@@ -38,8 +59,9 @@ class _RegisterpageState extends State<Registerpage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('error : $e')));
+            .showSnackBar(SnackBar(content: Text('Error: $e')));
       }
+      print("Supabase Insert Error: $e"); // Debugging
     }
   }
 
@@ -193,6 +215,50 @@ class _RegisterpageState extends State<Registerpage> {
                                   style: TextStyle(color: Colors.white),
                                   decoration: InputDecoration(
                                     hintText: 'Enter your email',
+                                    hintStyle: TextStyle(color: Colors.white60),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          "Name",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        // Custom Email TextField with icon
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Icon(
+                                  Icons.email_outlined,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  controller: name,
+                                  style: TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter your Full Name',
                                     hintStyle: TextStyle(color: Colors.white60),
                                     border: InputBorder.none,
                                   ),

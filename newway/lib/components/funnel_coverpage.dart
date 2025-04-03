@@ -53,15 +53,18 @@ class FunnelCoverpage extends StatelessWidget {
         color: Colors.grey,
         width: MediaQuery.of(context).size.width,
         height: coverHeight,
-        child: Image.asset(
-          'lib/images/anime.jpg',
-          fit: BoxFit.cover,
-        ),
+        child: card.userimageurl.startsWith('http')
+            ? Image.network(card.userimageurl, fit: BoxFit.cover)
+            : Image.asset('lib/images/anime.jpg',
+                fit: BoxFit.cover), // Fallback to a local default image
       );
 
   Widget buildProfileImage() => CircleAvatar(
         radius: profileHeight / 2,
         backgroundColor: Colors.grey.shade800,
-        backgroundImage: AssetImage(card.profileimageurl),
+        backgroundImage: card.profileimageurl.startsWith('http')
+            ? NetworkImage(card.profileimageurl)
+            : AssetImage('lib/images/lettern.png')
+                as ImageProvider, // Fallback to a local default image
       );
 }

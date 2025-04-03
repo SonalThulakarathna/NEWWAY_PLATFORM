@@ -68,6 +68,23 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
 
     final cuser = authservice.getuserid().toString();
     try {
+      // **Check if the user already has a funnel**
+      final existingFunnel = await supabase
+          .from('newwayfunnelinfo')
+          .select('id')
+          .eq('userid', cuser)
+          .maybeSingle(); // Fetch a single record if it exists
+
+      if (existingFunnel != null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('You can only create one funnel.')),
+        );
+        setState(() {
+          _isLoading = false;
+        });
+        return;
+      }
+
       // Upload profile image
       final filename = DateTime.now().microsecondsSinceEpoch.toString();
       final profilePath = 'uploads/profile_$filename';
@@ -77,12 +94,11 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
           .from('newwayfunnelprofileimage')
           .upload(profilePath, _profileImage!);
 
-      // Upload funnel image
       await supabase.storage
           .from('newwayfunnelbanner')
           .upload(funnelPath, _funnelImage!);
 
-      // Get public URLs for the uploaded images
+      // Get public URLs
       final String profileImageUrl = supabase.storage
           .from('newwayfunnelprofileimage')
           .getPublicUrl(profilePath);
@@ -90,16 +106,27 @@ class _CreatefunnelPageState extends State<CreatefunnelPage> {
           supabase.storage.from('newwayfunnelbanner').getPublicUrl(funnelPath);
 
       // Insert funnel data into the database
-      await supabase.from('newwayfunnelinfo').insert({
-        'name': creatorname.text,
-        'salutation': creatorsalutation.text,
-        'summaray': funneldescription.text,
-        'condition': selecteditem,
-        'price': selecteditem == 'private' && funnelprice.text.isNotEmpty
-            ? double.parse(funnelprice.text)
-            : 0.0,
-        'funnelimageurl': funnelImageUrl,
-        'profileimageurl': profileImageUrl,
+      final insertResponse = await supabase
+          .from('newwayfunnelinfo')
+          .insert({
+            'name': creatorname.text,
+            'salutation': creatorsalutation.text,
+            'summaray': funneldescription.text,
+            'condition': selecteditem,
+            'price': selecteditem == 'private' && funnelprice.text.isNotEmpty
+                ? double.parse(funnelprice.text)
+                : 0.0,
+            'funnelimageurl': funnelImageUrl,
+            'profileimageurl': profileImageUrl,
+            'userid': cuser,
+          })
+          .select('id')
+          .single();
+
+      final funnelId = insertResponse['id'];
+
+      await supabase.from('funnelmembers').insert({
+        'funnelid': funnelId,
         'userid': cuser,
       });
 

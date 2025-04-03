@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:newway/classes/card_data.dart';
 import 'package:newway/pages/funnel%20pages/funnel_cources.dart';
+import 'package:newway/pages/funnel%20pages/funnel_members.dart';
+import 'package:newway/pages/funnel%20pages/funnelcommunity.dart';
 
 class FunnelInsideTabbar extends StatelessWidget {
   final Cardcontent card;
@@ -9,7 +11,7 @@ class FunnelInsideTabbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return DefaultTabController(
-      length: 4,
+      length: 3,
       child: Scaffold(
         backgroundColor: Color(0xFF1E1E2E),
         appBar: AppBar(
@@ -26,15 +28,6 @@ class FunnelInsideTabbar extends StatelessWidget {
               Tab(
                 child: Text(
                   'Courses', // ✅ Fixed spelling mistake
-                  style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold),
-                ),
-              ),
-              Tab(
-                child: Text(
-                  'Meetings',
                   style: TextStyle(
                       fontSize: 18,
                       color: Colors.white,
@@ -69,9 +62,14 @@ class FunnelInsideTabbar extends StatelessWidget {
                   child: FunnelCources(
                 card: card,
               )),
-              Center(child: Text('Meetings Content')),
-              Center(child: Text('Community Content')),
-              Center(child: Text('Members Content')),
+              Center(
+                  child: Funnelcommunity(
+                channelId: card.id.toString(),
+              )),
+              Center(
+                  child: FunnelMembers(
+                card: card,
+              )),
             ],
           ),
         ),

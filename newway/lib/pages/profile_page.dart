@@ -14,7 +14,14 @@ class ProfilePage extends StatefulWidget {
 
 class _ProfilePageState extends State<ProfilePage> {
   final authservice = Authservicelog();
-  final supbase = Supabase.instance.client;
+  final supabase = Supabase.instance.client;
+  String name = 'Loading...'; // Initialize with default value
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUsername();
+  }
 
   void editprofilepage() {
     Navigator.push(
@@ -32,7 +39,7 @@ class _ProfilePageState extends State<ProfilePage> {
     }
 
     try {
-      final response = await supbase
+      final response = await supabase
           .from('newwayfunnelinfo')
           .select('userid')
           .eq('userid', uid)
@@ -45,12 +52,38 @@ class _ProfilePageState extends State<ProfilePage> {
     }
   }
 
+  Future<void> _fetchUsername() async {
+    try {
+      final uid = authservice.getuserid();
+      if (uid == null) throw Exception("User ID is null");
+
+      final response = await supabase
+          .from('newwayusers')
+          .select('full_name')
+          .eq('auth_id', uid)
+          .maybeSingle();
+
+      if (mounted) {
+        setState(() {
+          name = response?['full_name'] ?? 'No Name';
+        });
+      }
+    } catch (e) {
+      print("Error fetching username: $e");
+      if (mounted) {
+        setState(() {
+          name = 'Error loading name';
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF2D2D44),
+      backgroundColor: const Color(0xFF2D2D44),
       appBar: AppBar(
-        backgroundColor: Color(0xFF2D2D44),
+        backgroundColor: const Color(0xFF2D2D44),
         elevation: 0,
         title: const Text(
           'Profile',
@@ -125,9 +158,9 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 24),
 
                   // User info
-                  const Text(
-                    'Selina Rogert',
-                    style: TextStyle(
+                  Text(
+                    name,
+                    style: const TextStyle(
                       fontSize: 28,
                       color: Colors.white,
                       fontWeight: FontWeight.bold,
@@ -138,33 +171,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 8),
 
                   // Profession with icon
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: const Row(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Icon(
-                          Icons.camera_alt_outlined,
-                          color: Colors.white,
-                          size: 16,
-                        ),
-                        SizedBox(width: 8),
-                        Text(
-                          'Photographer',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Colors.white,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
 
                   const SizedBox(height: 30),
 
@@ -203,7 +209,6 @@ class _ProfilePageState extends State<ProfilePage> {
             ),
 
             // Stats Section
-
             const SizedBox(height: 30),
 
             // Content Section
@@ -223,7 +228,6 @@ class _ProfilePageState extends State<ProfilePage> {
                   const SizedBox(height: 20),
 
                   // Quick actions
-
                   const SizedBox(height: 30),
 
                   // Funnel Info Button (Conditional)
@@ -267,7 +271,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   context,
                                   MaterialPageRoute(
                                     builder: (context) =>
-                                        ProfilefunnelpageSelector(),
+                                        const ProfilefunnelpageSelector(),
                                   ),
                                 );
                               },

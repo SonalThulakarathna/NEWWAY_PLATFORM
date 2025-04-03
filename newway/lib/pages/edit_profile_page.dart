@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:newway/classes/authservice.dart';
 import 'package:newway/components/colors.dart';
 import 'package:newway/components/textfield.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class EditProfilePage extends StatelessWidget {
   const EditProfilePage({super.key});
@@ -8,7 +10,16 @@ class EditProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final nametext = TextEditingController();
-    final reputext = TextEditingController();
+    final authservice = Authservicelog();
+    final supabase = Supabase.instance.client;
+
+    Future<void> updateprofile() async {
+      final uid = authservice.getuserid().toString();
+      final updatedname = nametext.text;
+      await supabase
+          .from('newwayusers')
+          .update({'full_name': updatedname}).eq('auth_id', uid);
+    }
 
     return Scaffold(
       backgroundColor: primary,
@@ -25,22 +36,6 @@ class EditProfilePage extends StatelessWidget {
         ),
         centerTitle: true,
         iconTheme: const IconThemeData(color: Colors.white),
-        actions: [
-          TextButton(
-            onPressed: () {
-              // Save functionality can be implemented here
-              Navigator.pop(context);
-            },
-            child: const Text(
-              'Save',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ],
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -138,31 +133,6 @@ class EditProfilePage extends StatelessWidget {
               const SizedBox(height: 16),
 
               // Change pic button
-              TextButton.icon(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.photo_library_outlined,
-                  color: Colors.white,
-                  size: 18,
-                ),
-                label: const Text(
-                  'Change Profile Picture',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                  ),
-                ),
-                style: TextButton.styleFrom(
-                  backgroundColor: Colors.white.withOpacity(0.1),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(20),
-                  ),
-                ),
-              ),
 
               const SizedBox(height: 40),
 
@@ -222,32 +192,6 @@ class EditProfilePage extends StatelessWidget {
                     const SizedBox(height: 20),
 
                     // Reputation field with label
-                    const Padding(
-                      padding: EdgeInsets.only(left: 12, bottom: 8),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.work_outline,
-                            color: Colors.white,
-                            size: 16,
-                          ),
-                          SizedBox(width: 8),
-                          Text(
-                            'Reputation/Profession',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    Textfield(
-                      controller: reputext,
-                      hinttext: 'Reputation',
-                      obscuretext: false,
-                    ),
                   ],
                 ),
               ),
@@ -257,7 +201,7 @@ class EditProfilePage extends StatelessWidget {
               // Save button
               ElevatedButton(
                 onPressed: () {
-                  // Save functionality
+                  updateprofile();
                   Navigator.pop(context);
                 },
                 style: ElevatedButton.styleFrom(
