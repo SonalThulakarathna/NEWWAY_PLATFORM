@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:newway/components/colors.dart';
-import 'package:newway/pages/chat_page.dart';
+
 import 'package:newway/pages/favourite_page.dart';
 import 'package:newway/pages/intropage.dart';
 import 'package:newway/pages/profile_page.dart';
@@ -22,12 +21,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
     });
   }
 
-  final List<Widget> pages = [
-    Intropage(),
-    ChatPage(),
-    FavouritePage(),
-    ProfilePage()
-  ];
+  final List<Widget> pages = [Intropage(), FavouritePage(), ProfilePage()];
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +29,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
       body: pages[selectedindex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedindex,
-        backgroundColor: primary,
+        backgroundColor: Color(0xFF2D2D44),
         selectedItemColor: Colors.white,
         unselectedItemColor: const Color.fromARGB(255, 227, 129, 245),
         elevation: 0,
@@ -43,9 +37,7 @@ class _BottomNavBarState extends State<BottomNavBar> {
         type: BottomNavigationBarType.fixed,
         items: [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(
-              icon: Icon(Icons.favorite), label: 'Favourite'),
+          BottomNavigationBarItem(icon: Icon(Icons.pages), label: 'Funnels'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Person')
         ],
       ),

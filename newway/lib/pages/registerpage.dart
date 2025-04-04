@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:newway/classes/authservice.dart';
-import 'package:newway/components/auth_tile.dart';
-import 'package:newway/components/button.dart';
-import 'package:newway/components/colors.dart';
-import 'package:newway/components/textfield.dart';
 import 'package:newway/pages/login.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -18,22 +15,43 @@ class _RegisterpageState extends State<Registerpage> {
   final authservice = Authservicelog();
   final supabase = Supabase.instance.client;
   final email = TextEditingController();
+  final name = TextEditingController();
   final password = TextEditingController();
   final repassword = TextEditingController();
 
   void signup() async {
-    final signemail = email.text;
-    final signpass = password.text;
+    final signemail = email.text.trim();
+    final signpass = password.text.trim();
+    final fullname = name.text.trim();
+    final signrepass = repassword.text.trim();
 
-    final signrepass = repassword.text;
+    if (signemail.isEmpty || signpass.isEmpty || fullname.isEmpty) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('All fields are required')));
+      return;
+    }
 
     if (signpass != signrepass) {
       ScaffoldMessenger.of(context)
-          .showSnackBar(SnackBar(content: Text('Password dosent match')));
+          .showSnackBar(SnackBar(content: Text("Passwords don't match")));
       return;
     }
+
     try {
-      await authservice.signupemailpass(signemail, signrepass);
+      await authservice.signupemailpass(signemail, signpass);
+
+      final uid = await authservice.getuserid();
+      if (uid == null) throw Exception("User ID is null");
+
+      final response = await supabase.from('newwayusers').insert({
+        'full_name':
+            fullname, // Ensure it matches your Supabase table column name
+        'auth_id': uid,
+        'email': signemail
+      }).select(); // This helps check if the insertion was successful
+
+      print("Insert Response: $response");
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => Login()),
@@ -41,106 +59,486 @@ class _RegisterpageState extends State<Registerpage> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('error : $e')));
+            .showSnackBar(SnackBar(content: Text('Error: $e')));
       }
+      print("Supabase Insert Error: $e"); // Debugging
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      // Modern app bar with transparent background
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: primary,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: IconThemeData(color: Colors.white),
+        leading: IconButton(
+          icon: Container(
+            padding: EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.white.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child:
+                Icon(Icons.arrow_back_ios_new, color: Colors.white, size: 20),
+          ),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
-      backgroundColor: primary,
-      body: SingleChildScrollView(
-          child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            //image
-            Center(
-              child: Padding(
-                padding: const EdgeInsets.all(50.0),
-                child: Image.asset(
-                  'lib/images/lettern.png',
-                  height: 100,
-                ),
-              ),
-            ),
-
-            const SizedBox(
-              height: 25,
-            ),
-            Textfield(controller: email, hinttext: 'Email', obscuretext: false),
-            const SizedBox(
-              height: 25,
-            ),
-            Textfield(
-                controller: password, hinttext: 'Password', obscuretext: false),
-            const SizedBox(
-              height: 25,
-            ),
-            Textfield(
-                controller: repassword,
-                hinttext: 'Re enter password',
-                obscuretext: false),
-            const SizedBox(
-              height: 55,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Button(
-                text: 'Register',
-                onTap: signup,
-              ),
-            ),
-            const SizedBox(
-              height: 30,
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 25),
-              child: Row(
+      // Gradient background
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+            colors: [
+              Color(0xFF2D2D44), // Indigo
+              Color(0xFF1E1E2E), // Purple
+            ],
+          ),
+        ),
+        child: SafeArea(
+          child: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Expanded(
-                      child: Divider(
-                    thickness: 0.5,
-                    color: Colors.grey[400],
-                  )),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                    child: Text(
-                      "Or continue with",
-                      style: TextStyle(color: Colors.grey[400], fontSize: 16),
+                  // Title section
+                  Center(
+                    child: Column(
+                      children: [
+                        // Logo with modern container
+                        Container(
+                          padding: EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.white.withOpacity(0.1),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 20,
+                                spreadRadius: 5,
+                              ),
+                            ],
+                          ),
+                          child: Container(
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white.withOpacity(0.9),
+                            ),
+                            child: Image.asset(
+                              'lib/images/lettern.png',
+                              height: 60,
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 24),
+                        // Title text
+                        Text(
+                          "Create Account",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        Text(
+                          "Sign up to get started",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 16,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  Expanded(
-                      child: Divider(
-                    thickness: 0.5,
-                    color: Colors.grey[400],
-                  )),
+
+                  SizedBox(height: 40),
+
+                  // Form section with glassmorphism effect
+                  Container(
+                    padding: EdgeInsets.all(24),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(24),
+                      border: Border.all(
+                        color: Colors.white.withOpacity(0.2),
+                        width: 1.5,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 20,
+                          spreadRadius: 5,
+                        ),
+                      ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Email field label
+                        Text(
+                          "Email",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        // Custom Email TextField with icon
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Icon(
+                                  Icons.email_outlined,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  controller: email,
+                                  style: TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter your email',
+                                    hintStyle: TextStyle(color: Colors.white60),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 20,
+                        ),
+                        Text(
+                          "Name",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        // Custom Email TextField with icon
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Icon(
+                                  Icons.email_outlined,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  controller: name,
+                                  style: TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    hintText: 'Enter your Full Name',
+                                    hintStyle: TextStyle(color: Colors.white60),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 20),
+
+                        // Password field label
+                        Text(
+                          "Password",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        // Custom Password TextField with icon
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Icon(
+                                  Icons.lock_outline,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  controller: password,
+                                  obscureText: true,
+                                  style: TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    hintText: 'Create a password',
+                                    hintStyle: TextStyle(color: Colors.white60),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 20),
+
+                        // Confirm Password field label
+                        Text(
+                          "Confirm Password",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 14,
+                          ),
+                        ),
+                        SizedBox(height: 8),
+                        // Custom Confirm Password TextField with icon
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(16),
+                            border: Border.all(
+                              color: Colors.white.withOpacity(0.2),
+                            ),
+                          ),
+                          child: Row(
+                            children: [
+                              Padding(
+                                padding: const EdgeInsets.all(16.0),
+                                child: Icon(
+                                  Icons.lock_outline,
+                                  color: Colors.white70,
+                                ),
+                              ),
+                              Expanded(
+                                child: TextField(
+                                  controller: repassword,
+                                  obscureText: true,
+                                  style: TextStyle(color: Colors.white),
+                                  decoration: InputDecoration(
+                                    hintText: 'Re-enter your password',
+                                    hintStyle: TextStyle(color: Colors.white60),
+                                    border: InputBorder.none,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 24),
+
+                        // Password requirements hint
+                        Container(
+                          padding: EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.white.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(
+                                Icons.info_outline,
+                                color: Colors.white70,
+                                size: 20,
+                              ),
+                              SizedBox(width: 12),
+                              Expanded(
+                                child: Text(
+                                  "Password should be at least 8 characters with a mix of letters, numbers and symbols",
+                                  style: TextStyle(
+                                    color: Colors.white70,
+                                    fontSize: 12,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        SizedBox(height: 32),
+
+                        // Modern Register button
+                        GestureDetector(
+                          onTap: signup,
+                          child: Container(
+                            width: double.infinity,
+                            padding: EdgeInsets.symmetric(vertical: 16),
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                colors: [
+                                  Color(0xFF6366F1),
+                                  Color(0xFF8B5CF6),
+                                ],
+                              ),
+                              borderRadius: BorderRadius.circular(16),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Color(0xFF6366F1).withOpacity(0.5),
+                                  blurRadius: 10,
+                                  offset: Offset(0, 4),
+                                ),
+                              ],
+                            ),
+                            child: Center(
+                              child: Text(
+                                "Register",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  SizedBox(height: 32),
+
+                  // Divider with better styling
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Divider(
+                          thickness: 0.5,
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: Text(
+                          "Or continue with",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: Divider(
+                          thickness: 0.5,
+                          color: Colors.white.withOpacity(0.3),
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 32),
+
+                  // Social login buttons with modern styling
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      // Google button
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Image.asset(
+                          'lib/images/google.png',
+                          height: 24,
+                        ),
+                      ),
+                      SizedBox(width: 24),
+                      // Apple button
+                      Container(
+                        padding: EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1.5,
+                          ),
+                        ),
+                        child: Image.asset(
+                          'lib/images/apple.png',
+                          height: 24,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  SizedBox(height: 32),
+
+                  // Already have an account link
+                  Center(
+                    child: GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) => Login()),
+                        );
+                      },
+                      child: RichText(
+                        text: TextSpan(
+                          text: "Already have an account? ",
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 14,
+                          ),
+                          children: [
+                            TextSpan(
+                              text: "Login",
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
-            const SizedBox(
-              height: 50,
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Atile(path: 'lib/images/google.png'),
-                const SizedBox(
-                  width: 25,
-                ),
-                Atile(path: 'lib/images/apple.png')
-              ],
-            ),
-          ],
+          ),
         ),
-      )),
+      ),
     );
   }
 }

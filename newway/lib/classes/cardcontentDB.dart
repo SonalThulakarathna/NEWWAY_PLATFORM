@@ -7,8 +7,6 @@ class Cardcontentdb {
   // Fetch data from Supabase
   Future<List<Cardcontent>> getCardContents() async {
     try {
-      print("🏁 Fetching data from newwayfunnelinfo...");
-
       // Fetch all columns from newwayfunnelinfo
       final response = await _supabase
           .from('newwayfunnelinfo')
@@ -16,15 +14,15 @@ class Cardcontentdb {
           .order('created_at', ascending: false); // Sort by newest first
 
       if (response.isEmpty) {
-        print("⚠️ No data found in newwayfunnelinfo table");
+        print(" No data found in newwayfunnelinfo table");
         return [];
       }
 
-      print("✅ Fetched ${response.length} records");
+      print(" Fetched ${response.length} records");
 
       // Map response to Cardcontent objects
       return response.map((item) {
-        print("🖼 Processing item: ${item['id']}");
+        print(" Processing item: ${item['id']}");
 
         return Cardcontent(
           title: item['salutation']?.toString() ?? 'No Salutation',
@@ -34,12 +32,16 @@ class Cardcontentdb {
           imagepath: item['imagepath']?.toString() ?? 'lib/images/default.jpg',
           members: item['members']?.toString() ?? '0',
           price: item['price']?.toString() ?? '0',
+          id: int.tryParse(item['id'].toString()) ?? 0,
+          funnelownerid: int.tryParse(item['userid'].toString()) ?? 0,
           userimageurl:
-              item['funnelimageurl']?.toString() ?? 'lib/images/default.jpg',
+              item['funnelimageurl']?.toString() ?? 'lib/images/anime.jpg',
+          profileimageurl:
+              item['profileimageurl']?.toString() ?? 'lib/images/lettern.png',
         );
       }).toList();
     } catch (e) {
-      print("🛑 Error fetching data: ${e.toString()}");
+      print(" Error fetching data: ${e.toString()}");
       return [];
     }
   }

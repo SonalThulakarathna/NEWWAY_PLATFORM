@@ -13,126 +13,255 @@ class ContentCard extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Card(
-        margin: const EdgeInsets.all(16),
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(16),
         ),
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(0),
+        elevation: 3,
+        shadowColor: Colors.black.withOpacity(0.2),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(
+            minWidth: double.infinity,
+          ),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header Row
-              Image(
-                height: 180,
-                image: _getImageProvider(card.userimageurl),
-                fit: BoxFit.cover,
-              ),
+              // Header Image with Overlay
+              Stack(
+                children: [
+                  ClipRRect(
+                    borderRadius: const BorderRadius.only(
+                      topLeft: Radius.circular(16),
+                      topRight: Radius.circular(16),
+                    ),
+                    child: Image(
+                      height: 180,
+                      image: _getImageProvider(card.userimageurl),
+                      fit: BoxFit.cover,
+                      width: double.infinity,
+                    ),
+                  ),
 
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  child: Column(
-                    children: [
-                      Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                  // Status badge (private/public)
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: card.condition == 'private'
+                            ? Colors.black.withOpacity(0.7)
+                            : Colors.green.withOpacity(0.8),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          CircleAvatar(
-                            radius: 24,
-                            backgroundImage: _getImageProvider(card.imagepath),
-                            onBackgroundImageError: (_, __) =>
-                                const Icon(Icons.error, color: Colors.red),
+                          Icon(
+                            card.condition == 'private'
+                                ? Icons.lock
+                                : Icons.done,
+                            color: Colors.white,
+                            size: 14,
                           ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  card.author,
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.grey[900],
-                                  ),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                                const SizedBox(height: 4),
-                                Text(
-                                  card.subtitle,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey[600],
-                                    height: 1.4,
-                                  ),
-                                  maxLines: 3,
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ],
+                          const SizedBox(width: 4),
+                          Text(
+                            card.condition == 'private' ? 'Private' : 'Public',
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: 12),
+                    ),
+                  ),
+                ],
+              ),
 
-                      // Footer Row
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Row(
+              // Content Section
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Author Info Row
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Profile Image with Border
+                        Container(
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: Colors.white,
+                              width: 2,
+                            ),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.1),
+                                blurRadius: 4,
+                                spreadRadius: 0,
+                              ),
+                            ],
+                          ),
+                          child: CircleAvatar(
+                            radius: 24,
+                            backgroundImage:
+                                _getImageProvider(card.profileimageurl),
+                            onBackgroundImageError: (_, __) =>
+                                const Icon(Icons.error, color: Colors.red),
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+
+                        // Author Details
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              const SizedBox(width: 4),
-                              if (card.condition == 'private')
-                                Row(
+                              Text(
+                                card.author,
+                                style: const TextStyle(
+                                  fontSize: 17,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                  letterSpacing: -0.2,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                card.subtitle,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
+                                  height: 1.4,
+                                  letterSpacing: 0.1,
+                                ),
+                                maxLines: 3,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    // Divider
+                    Divider(
+                      color: Colors.grey[200],
+                      thickness: 1,
+                    ),
+
+                    // Footer Row
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        // Status and Members
+                        Row(
+                          children: [
+                            // Status Indicator
+                            if (card.condition == 'private')
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
                                   children: [
                                     Icon(
                                       Icons.lock,
                                       color: textfieldgrey,
+                                      size: 16,
                                     ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
+                                    const SizedBox(width: 4),
                                     Text(
                                       'Private',
                                       style: TextStyle(
                                         color: textfieldgrey,
-                                        fontSize: 15,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     )
                                   ],
-                                )
-                              else
-                                Row(
+                                ),
+                              )
+                            else
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[100],
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
                                   children: [
                                     Icon(
                                       Icons.done,
                                       color: textfieldgrey,
+                                      size: 16,
                                     ),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
+                                    const SizedBox(width: 4),
                                     Text(
                                       'Public',
                                       style: TextStyle(
                                         color: textfieldgrey,
-                                        fontSize: 15,
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w500,
                                       ),
                                     )
                                   ],
-                                ), // Empty widget if condition is false
-
-                              const SizedBox(width: 12),
-                              Text(
-                                "${card.members} Members",
-                                style: TextStyle(
-                                  fontSize: 14,
-                                  color: Colors.grey[600],
                                 ),
                               ),
-                            ],
+
+                            const SizedBox(width: 12),
+
+                            // Members Count
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 8, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: Colors.grey[100],
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.people,
+                                    size: 16,
+                                    color: Colors.grey[600],
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    "${card.members}",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey[600],
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Price
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
+                          decoration: BoxDecoration(
+                            color: Colors.blue[50],
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          Text(
+                          child: Text(
                             "\$${card.price}",
                             style: TextStyle(
                               fontSize: 16,
@@ -140,10 +269,10 @@ class ContentCard extends StatelessWidget {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               )
             ],
@@ -161,7 +290,7 @@ class ContentCard extends StatelessWidget {
       return AssetImage(imagePath); // Handle local assets
     } else {
       // Return a placeholder or default image if the path is empty
-      return AssetImage(
+      return const AssetImage(
           'lib/images/anime.jpg'); // Add a placeholder image in your assets
     }
   }

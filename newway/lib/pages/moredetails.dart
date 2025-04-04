@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:newway/classes/authservice.dart';
 import 'package:newway/classes/card_data.dart';
 import 'package:newway/components/button.dart';
 import 'package:newway/components/carousel.dart';
-import 'package:newway/components/colors.dart';
 import 'package:newway/pages/funnel%20pages/funnel_inside_tabbar.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 class Moredetails extends StatefulWidget {
   final Cardcontent cc;
@@ -13,18 +14,42 @@ class Moredetails extends StatefulWidget {
   State<Moredetails> createState() => _MoredetailsState();
 }
 
+final supabase = Supabase.instance.client;
+final auth = Authservicelog();
+
 class _MoredetailsState extends State<Moredetails> {
-  void funnelinside(Cardcontent card) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => FunnelInsideTabbar(card: card)),
-    );
+  void funnelinside(Cardcontent card) async {
+    final cuser = auth.getuserid(); // Get current user ID
+
+    try {
+      await supabase.from('funnelmembers').insert({
+        'userid': cuser,
+        'funnelid': card.id,
+      });
+
+      // If no exception, insert was successful, navigate
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => FunnelInsideTabbar(card: card),
+        ),
+      );
+    } catch (e) {
+      // Handle error case
+      print("Error joining funnel: $e");
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("An error occurred. Please try again."),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: primary,
+      backgroundColor: Color(0xFF1E1E2E),
       appBar: AppBar(
           backgroundColor: Colors.transparent,
           elevation: 0,
