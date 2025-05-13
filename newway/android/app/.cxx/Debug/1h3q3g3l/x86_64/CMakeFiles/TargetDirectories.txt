@@ -1,0 +1,2 @@
+C:/Users/Dell/Desktop/TaskMate Application/NEWWAY_PLATFORM/newway/android/app/.cxx/Debug/1h3q3g3l/x86_64/CMakeFiles/edit_cache.dir
+C:/Users/Dell/Desktop/TaskMate Application/NEWWAY_PLATFORM/newway/android/app/.cxx/Debug/1h3q3g3l/x86_64/CMakeFiles/rebuild_cache.dir

@@ -40,6 +40,21 @@ dependencies:
   flutter_native_splash: ^2.4.4
   carousel_slider: ^5.0.0
   smooth_page_indicator: ^1.2.0+3
+<<<<<<< Updated upstream
+=======
+  image_picker: ^1.1.2
+  file_picker: ^9.0.0
+  video_player: ^2.9.3
+  chewie: ^1.10.0
+  flutter_vlc_player: ^7.4.3
+  appinio_video_player: ^1.2.2
+  uuid: ^4.5.1
+  lottie: ^3.2.0
+  liquid_pull_to_refresh: ^3.0.1
+  flutter_launcher_icons: ^0.14.3
+  get_time_ago: ^2.3.0
+  timeago: ^3.2.2
+>>>>>>> Stashed changes
 
 dev_dependencies:
   flutter_test:
