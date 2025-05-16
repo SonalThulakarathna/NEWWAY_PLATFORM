@@ -22,7 +22,7 @@ class _SidebarState extends State<Sidebar> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
-      backgroundColor: Color(0xFF1E1E2E),
+      backgroundColor: const Color(0xFF1F1F1F), // Dark gray background
       child: Column(
         children: [
           Expanded(
@@ -35,17 +35,18 @@ class _SidebarState extends State<Sidebar> {
                   decoration: InputDecoration(
                     prefixIcon: const Icon(
                       Icons.search,
-                      color: Colors.white,
+                      color: Colors.white, // White icons for search
                     ),
                     suffixIcon: IconButton(
                       onPressed: () {},
                       icon: const Icon(
                         Icons.clear,
-                        color: Colors.white,
+                        color: Colors.white, // White icon for clearing search
                       ),
                     ),
                     hintText: "Search your funnel",
-                    hintStyle: TextStyle(color: Colors.grey),
+                    hintStyle: TextStyle(
+                        color: const Color(0xFFAAAAAA)), // Light gray hint text
                     border: InputBorder.none,
                   ),
                 ),
@@ -59,7 +60,8 @@ class _SidebarState extends State<Sidebar> {
                   ),
                   title: Text(
                     "Create Funnel",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(
+                        color: Colors.white), // White text for menu item
                   ),
                   onTap: () {
                     Navigator.push(
@@ -80,7 +82,8 @@ class _SidebarState extends State<Sidebar> {
                   ),
                   title: Text(
                     "Discover Funnel",
-                    style: TextStyle(color: Colors.white),
+                    style: TextStyle(
+                        color: Colors.white), // White text for menu item
                   ),
                   onTap: () {},
                 ),
@@ -95,7 +98,7 @@ class _SidebarState extends State<Sidebar> {
             ),
             title: Text(
               "Log out",
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(color: Colors.white), // White text for logout
             ),
             onTap: logout,
           ),

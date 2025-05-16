@@ -2,7 +2,6 @@ import 'package:appinio_video_player/appinio_video_player.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import 'package:newway/classes/card_data.dart';
-import 'package:newway/components/colors.dart';
 import 'package:newway/components/funnel_coverpage.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
@@ -14,7 +13,8 @@ class FunnelCources extends StatefulWidget {
   State<FunnelCources> createState() => _FunnelCourcesState();
 }
 
-class _FunnelCourcesState extends State<FunnelCources> {
+class _FunnelCourcesState extends State<FunnelCources>
+    with SingleTickerProviderStateMixin {
   final supabase = Supabase.instance.client;
 
   List<Map<String, dynamic>> videos = [];
@@ -22,22 +22,40 @@ class _FunnelCourcesState extends State<FunnelCources> {
   bool isVideoPlaying = false;
   int? selectedVideoIndex;
   CustomVideoPlayerController? _videoPlayerController;
+  late AnimationController _animationController;
+
+  // YouTube-like dark theme colors
+  final Color backgroundColor = const Color(0xFF181818); // Dark background
+  final Color surfaceColor =
+      const Color(0xFF121212); // Slightly lighter dark background
+  final Color cardColor = const Color(0xFF333333); // Dark gray for cards
+  final Color accentColor = const Color(0xFFFF0000); // YouTube red
+  final Color secondaryAccent =
+      const Color(0xFFFCFCFC); // Light gray text for secondary info
+  final Color textColor = Colors.white; // White text
+  final Color textSecondary =
+      const Color(0x80FFFFFF); // Lighter text for secondary elements
+  final Color dividerColor = const Color(0xFF444444); // Darker dividers
 
   @override
   void initState() {
     super.initState();
     fetchVideos();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
   }
 
   @override
   void dispose() {
     _videoPlayerController?.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
   Future<void> fetchVideos() async {
     try {
-      // Fetch user id from newwayfunnelinfo where funnel id matches
       final funnelInfoResponse = await supabase
           .from('newwayfunnelinfo')
           .select('userid')
@@ -45,11 +63,9 @@ class _FunnelCourcesState extends State<FunnelCources> {
 
       print("Fetched funnel info: $funnelInfoResponse");
 
-      // Check if we got a valid response
       if (funnelInfoResponse.isNotEmpty) {
         final userId = funnelInfoResponse[0]['userid'];
 
-        // Fetch videos where funnelownerid matches the fetched userId
         final response = await supabase
             .from('funnelvideodetails')
             .select()
@@ -69,7 +85,6 @@ class _FunnelCourcesState extends State<FunnelCources> {
           });
         }
       } else {
-        // Handle case if no matching funnel owner found
         setState(() {
           isLoading = false;
         });
@@ -84,49 +99,53 @@ class _FunnelCourcesState extends State<FunnelCources> {
   }
 
   void _initializeVideoPlayer(String videoUrl) async {
-    // Dispose previous controller if exists
     _videoPlayerController?.dispose();
 
-    // Create a new video player controller
     final videoPlayerController = VideoPlayerController.network(videoUrl);
 
     try {
-      // Initialize the controller
       await videoPlayerController.initialize();
 
       _videoPlayerController = CustomVideoPlayerController(
         context: context,
         videoPlayerController: videoPlayerController,
-        customVideoPlayerSettings: const CustomVideoPlayerSettings(
+        customVideoPlayerSettings: CustomVideoPlayerSettings(
           controlBarAvailable: true,
-          playButton: Icon(Icons.play_arrow, color: Colors.white),
-          pauseButton: Icon(Icons.pause, color: Colors.white),
-          settingsButton: Icon(Icons.settings, color: Colors.white),
+          playButton: Icon(Icons.play_arrow, color: textColor),
+          pauseButton: Icon(Icons.pause, color: textColor),
+          settingsButton: Icon(Icons.settings, color: textColor),
           placeholderWidget: Center(
             child: CircularProgressIndicator(
-              color: Colors.white,
+              color: accentColor,
             ),
           ),
           controlBarDecoration: BoxDecoration(
             color: Colors.black45,
+            borderRadius: BorderRadius.circular(8),
           ),
           customAspectRatio: 16 / 9,
           showFullscreenButton: true,
+          controlBarPadding:
+              const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
         ),
       );
 
-      // Auto-play the video
       _videoPlayerController?.videoPlayerController.play();
 
       setState(() {
         isVideoPlaying = true;
       });
+
+      _animationController.forward();
     } catch (e) {
       print("Error initializing video player: $e");
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text("Failed to load video"),
-          backgroundColor: Colors.red,
+          backgroundColor: secondaryAccent,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
       videoPlayerController.dispose();
@@ -138,7 +157,7 @@ class _FunnelCourcesState extends State<FunnelCources> {
     if (videoUrl != null && videoUrl.isNotEmpty) {
       setState(() {
         selectedVideoIndex = index;
-        isLoading = true; // Show loading indicator
+        isLoading = true;
       });
 
       try {
@@ -148,138 +167,181 @@ class _FunnelCourcesState extends State<FunnelCources> {
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
+        SnackBar(
           content: Text("Invalid video URL"),
-          backgroundColor: Colors.red,
+          backgroundColor: secondaryAccent,
+          behavior: SnackBarBehavior.floating,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
         ),
       );
     }
   }
 
   void _closeVideoPlayer() {
-    _videoPlayerController?.dispose();
-    setState(() {
-      isVideoPlaying = false;
-      selectedVideoIndex = null;
-      _videoPlayerController = null;
+    _animationController.reverse().then((_) {
+      _videoPlayerController?.dispose();
+      setState(() {
+        isVideoPlaying = false;
+        selectedVideoIndex = null;
+        _videoPlayerController = null;
+      });
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFF1E1E2E),
+      backgroundColor: backgroundColor,
       body: Column(
         children: [
-          // Keep the original FunnelCoverpage
+          // FunnelCoverpage when no video is playing
           if (!isVideoPlaying)
             FunnelCoverpage(
               card: widget.card,
             ),
 
-          // Video player (when a video is selected)
+          // Video player (when video is playing)
           if (isVideoPlaying && _videoPlayerController != null)
-            Container(
-              height: 240,
-              width: double.infinity,
-              color: Colors.black,
-              child: Stack(
-                children: [
-                  // Video player
-                  CustomVideoPlayer(
-                    customVideoPlayerController: _videoPlayerController!,
+            AnimatedBuilder(
+              animation: _animationController,
+              builder: (context, child) {
+                return Container(
+                  height: 240,
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.3),
+                        blurRadius: 10,
+                        offset: const Offset(0, 4),
+                      ),
+                    ],
                   ),
-
-                  // Close button
-                  Positioned(
-                    top: 8,
-                    right: 8,
-                    child: GestureDetector(
-                      onTap: _closeVideoPlayer,
-                      child: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: Colors.black.withOpacity(0.6),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(
-                          Icons.close,
-                          color: Colors.white,
-                          size: 20,
+                  child: Stack(
+                    children: [
+                      Opacity(
+                        opacity: _animationController.value,
+                        child: CustomVideoPlayer(
+                          customVideoPlayerController: _videoPlayerController!,
                         ),
                       ),
-                    ),
+                      Positioned(
+                        top: 8,
+                        right: 8,
+                        child: GestureDetector(
+                          onTap: _closeVideoPlayer,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              Icons.close,
+                              color: textColor,
+                              size: 20,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             ),
 
           // Course content section
           Expanded(
             child: Container(
               decoration: BoxDecoration(
-                color: Color(0xFF2D2D44),
+                color: surfaceColor,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(30),
                   topRight: Radius.circular(30),
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.1),
-                    blurRadius: 10,
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 15,
                     offset: const Offset(0, -5),
                   ),
                 ],
               ),
               child: Column(
                 children: [
-                  // Header
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(20, 24, 20, 16),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 6),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                          child: Row(
-                            children: [
-                              Icon(
-                                Icons.play_circle_outline,
-                                color: Colors.white.withOpacity(0.9),
-                                size: 16,
+                  Column(
+                    children: [
+                      const SizedBox(height: 12),
+                      Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.2),
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(20, 20, 20, 16),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Course Content',
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 20,
+                                fontWeight: FontWeight.bold,
                               ),
-                              const SizedBox(width: 4),
-                              Text(
-                                '${videos.length} Videos',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: accentColor.withOpacity(0.2),
+                                borderRadius: BorderRadius.circular(20),
+                                border: Border.all(
+                                  color: accentColor.withOpacity(0.3),
+                                  width: 1,
                                 ),
                               ),
-                            ],
-                          ),
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.play_circle_outline,
+                                    color: accentColor,
+                                    size: 16,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${videos.length} Videos',
+                                    style: TextStyle(
+                                      color: accentColor,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
 
-                  // Now playing indicator (when a video is selected)
+                  // Now playing indicator
                   if (isVideoPlaying && selectedVideoIndex != null)
                     Container(
                       margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 16, vertical: 12),
                       decoration: BoxDecoration(
-                        color: buttoncolor.withOpacity(0.2),
+                        color: accentColor.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(12),
                         border: Border.all(
-                          color: buttoncolor.withOpacity(0.3),
+                          color: accentColor.withOpacity(0.3),
                           width: 1,
                         ),
                       ),
@@ -288,12 +350,12 @@ class _FunnelCourcesState extends State<FunnelCources> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: buttoncolor,
+                              color: accentColor,
                               shape: BoxShape.circle,
                             ),
-                            child: const Icon(
+                            child: Icon(
                               Icons.play_arrow,
-                              color: Colors.white,
+                              color: textColor,
                               size: 16,
                             ),
                           ),
@@ -302,10 +364,10 @@ class _FunnelCourcesState extends State<FunnelCources> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                const Text(
+                                Text(
                                   'Now Playing',
                                   style: TextStyle(
-                                    color: Colors.white,
+                                    color: accentColor,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -315,8 +377,8 @@ class _FunnelCourcesState extends State<FunnelCources> {
                                   _formatVideoTitle(videos[selectedVideoIndex!]
                                           ['videourl'] ??
                                       ""),
-                                  style: const TextStyle(
-                                    color: Colors.white,
+                                  style: TextStyle(
+                                    color: textColor,
                                     fontSize: 14,
                                     fontWeight: FontWeight.bold,
                                   ),
@@ -325,6 +387,16 @@ class _FunnelCourcesState extends State<FunnelCources> {
                                 ),
                               ],
                             ),
+                          ),
+                          IconButton(
+                            icon: Icon(
+                              Icons.fullscreen,
+                              color: textColor,
+                              size: 20,
+                            ),
+                            onPressed: () {
+                              // Trigger fullscreen mode
+                            },
                           ),
                         ],
                       ),
@@ -347,7 +419,7 @@ class _FunnelCourcesState extends State<FunnelCources> {
                                 Text(
                                   'Loading courses...',
                                   style: TextStyle(
-                                    color: Colors.white.withOpacity(0.8),
+                                    color: textSecondary,
                                     fontSize: 16,
                                     fontWeight: FontWeight.w500,
                                   ),
@@ -356,228 +428,8 @@ class _FunnelCourcesState extends State<FunnelCources> {
                             ),
                           )
                         : videos.isEmpty
-                            ? Center(
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.videocam_off_outlined,
-                                      size: 70,
-                                      color: Colors.white.withOpacity(0.5),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      "No videos available yet",
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.8),
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      "Check back later for new content",
-                                      style: TextStyle(
-                                        color: Colors.white.withOpacity(0.6),
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : ListView.builder(
-                                padding:
-                                    const EdgeInsets.fromLTRB(16, 0, 16, 20),
-                                itemCount: videos.length,
-                                itemBuilder: (context, index) {
-                                  final video = videos[index];
-                                  final bool isSelected =
-                                      selectedVideoIndex == index;
-
-                                  return Container(
-                                    margin: const EdgeInsets.only(bottom: 16),
-                                    decoration: BoxDecoration(
-                                      gradient: LinearGradient(
-                                        colors: isSelected
-                                            ? [
-                                                buttoncolor.withOpacity(0.3),
-                                                buttoncolor.withOpacity(0.1),
-                                              ]
-                                            : [
-                                                Colors.white.withOpacity(0.1),
-                                                Colors.white.withOpacity(0.05),
-                                              ],
-                                        begin: Alignment.topLeft,
-                                        end: Alignment.bottomRight,
-                                      ),
-                                      borderRadius: BorderRadius.circular(16),
-                                      border: Border.all(
-                                        color: isSelected
-                                            ? buttoncolor.withOpacity(0.5)
-                                            : Colors.white.withOpacity(0.1),
-                                        width: 1,
-                                      ),
-                                    ),
-                                    child: Material(
-                                      color: Colors.transparent,
-                                      borderRadius: BorderRadius.circular(16),
-                                      clipBehavior: Clip.antiAlias,
-                                      child: InkWell(
-                                        onTap: () => _playVideo(index),
-                                        splashColor:
-                                            Colors.white.withOpacity(0.1),
-                                        highlightColor:
-                                            Colors.white.withOpacity(0.05),
-                                        child: Padding(
-                                          padding: const EdgeInsets.all(16),
-                                          child: Row(
-                                            children: [
-                                              // Video thumbnail/play button
-                                              Stack(
-                                                alignment: Alignment.center,
-                                                children: [
-                                                  Container(
-                                                    width: 80,
-                                                    height: 60,
-                                                    decoration: BoxDecoration(
-                                                      color: isSelected
-                                                          ? buttoncolor
-                                                              .withOpacity(0.5)
-                                                          : buttoncolor
-                                                              .withOpacity(0.3),
-                                                      borderRadius:
-                                                          BorderRadius.circular(
-                                                              12),
-                                                    ),
-                                                  ),
-                                                  Icon(
-                                                    isSelected
-                                                        ? Icons
-                                                            .pause_circle_filled
-                                                        : Icons
-                                                            .play_circle_fill,
-                                                    color: Colors.white,
-                                                    size: 30,
-                                                  ),
-                                                  if (isSelected)
-                                                    Positioned(
-                                                      top: 4,
-                                                      left: 4,
-                                                      child: Container(
-                                                        padding:
-                                                            const EdgeInsets
-                                                                .symmetric(
-                                                          horizontal: 6,
-                                                          vertical: 2,
-                                                        ),
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          color: Colors.black
-                                                              .withOpacity(0.6),
-                                                          borderRadius:
-                                                              BorderRadius
-                                                                  .circular(4),
-                                                        ),
-                                                        child: const Text(
-                                                          'PLAYING',
-                                                          style: TextStyle(
-                                                            color: Colors.white,
-                                                            fontSize: 8,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ),
-                                                ],
-                                              ),
-                                              const SizedBox(width: 16),
-
-                                              // Video details
-                                              Expanded(
-                                                child: Column(
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: [
-                                                    // Video title
-                                                    Text(
-                                                      _formatVideoTitle(
-                                                          video['videourl'] ??
-                                                              "No Video URL"),
-                                                      style: TextStyle(
-                                                        color: Colors.white,
-                                                        fontSize: 16,
-                                                        fontWeight: isSelected
-                                                            ? FontWeight.bold
-                                                            : FontWeight.w600,
-                                                      ),
-                                                      maxLines: 1,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-                                                    const SizedBox(height: 6),
-
-                                                    // Video description
-                                                    Text(
-                                                      video['videodes'] ??
-                                                          'No description available',
-                                                      style: TextStyle(
-                                                        color: Colors.white
-                                                            .withOpacity(0.7),
-                                                        fontSize: 14,
-                                                      ),
-                                                      maxLines: 2,
-                                                      overflow:
-                                                          TextOverflow.ellipsis,
-                                                    ),
-
-                                                    const SizedBox(height: 8),
-
-                                                    // Video metadata
-                                                    Row(
-                                                      children: [
-                                                        _buildMetadataItem(
-                                                          icon:
-                                                              Icons.access_time,
-                                                          text:
-                                                              '10:30', // Placeholder duration
-                                                        ),
-                                                        const SizedBox(
-                                                            width: 16),
-                                                        _buildMetadataItem(
-                                                          icon: Icons
-                                                              .remove_red_eye_outlined,
-                                                          text:
-                                                              '${(index + 1) * 12}', // Placeholder views
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-
-                                              // Download/options button
-                                              IconButton(
-                                                icon: Icon(
-                                                  isSelected
-                                                      ? Icons.more_vert
-                                                      : Icons.more_horiz,
-                                                  color: Colors.white,
-                                                ),
-                                                onPressed: () {
-                                                  // Options menu can be implemented here
-                                                  _showVideoOptions(
-                                                      context, video);
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  );
-                                },
-                              ),
+                            ? _buildEmptyState()
+                            : _buildVideoList(),
                   ),
                 ],
               ),
@@ -588,98 +440,225 @@ class _FunnelCourcesState extends State<FunnelCources> {
     );
   }
 
-  // Show video options bottom sheet
-  void _showVideoOptions(BuildContext context, Map<String, dynamic> video) {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: primary,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+  // Empty state widget
+  Widget _buildEmptyState() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+              color: cardColor.withOpacity(0.5),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.videocam_off_outlined,
+              size: 60,
+              color: textSecondary,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            "No videos available yet",
+            style: TextStyle(
+              color: textColor,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 40),
+            child: Text(
+              "Check back later for new content",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: textSecondary,
+                fontSize: 16,
+              ),
+            ),
+          ),
+          const SizedBox(height: 32),
+          ElevatedButton.icon(
+            onPressed: () {
+              setState(() {
+                isLoading = true;
+              });
+              fetchVideos();
+            },
+            icon: const Icon(Icons.refresh),
+            label: const Text("Refresh"),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: accentColor,
+              foregroundColor: textColor,
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+          ),
+        ],
       ),
-      builder: (context) {
+    );
+  }
+
+  // Video list widget
+  Widget _buildVideoList() {
+    return ListView.builder(
+      padding: const EdgeInsets.fromLTRB(16, 0, 16, 20),
+      itemCount: videos.length,
+      itemBuilder: (context, index) {
+        final video = videos[index];
+        final bool isSelected = selectedVideoIndex == index;
+
         return Container(
-          padding: const EdgeInsets.symmetric(vertical: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.3),
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              _buildOptionItem(
-                icon: Icons.download_outlined,
-                text: 'Download Video',
-                onTap: () {
-                  Navigator.pop(context);
-                  // Download functionality
-                },
-              ),
-              _buildOptionItem(
-                icon: Icons.share_outlined,
-                text: 'Share Video',
-                onTap: () {
-                  Navigator.pop(context);
-                  // Share functionality
-                },
-              ),
-              _buildOptionItem(
-                icon: Icons.bookmark_border_outlined,
-                text: 'Save for Later',
-                onTap: () {
-                  Navigator.pop(context);
-                  // Save functionality
-                },
-              ),
-              _buildOptionItem(
-                icon: Icons.report_outlined,
-                text: 'Report Issue',
-                onTap: () {
-                  Navigator.pop(context);
-                  // Report functionality
-                },
+          margin: const EdgeInsets.only(bottom: 16),
+          decoration: BoxDecoration(
+            color: isSelected ? accentColor.withOpacity(0.1) : cardColor,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isSelected ? accentColor : Colors.transparent,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.1),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
               ),
             ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(16),
+            child: Material(
+              color: Colors.transparent,
+              child: InkWell(
+                onTap: () => _playVideo(index),
+                splashColor: accentColor.withOpacity(0.1),
+                highlightColor: accentColor.withOpacity(0.05),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Video thumbnail/play button
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 80,
+                            height: 60,
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? accentColor.withOpacity(0.3)
+                                  : Colors.black.withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                color: isSelected
+                                    ? accentColor
+                                    : Colors.transparent,
+                                width: 1,
+                              ),
+                              image: DecorationImage(
+                                image: NetworkImage(
+                                  'https://picsum.photos/seed/${index + 1}/200/300',
+                                ),
+                                fit: BoxFit.cover,
+                                opacity: 0.7,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.all(6),
+                            decoration: BoxDecoration(
+                              color: isSelected
+                                  ? accentColor
+                                  : Colors.black.withOpacity(0.5),
+                              shape: BoxShape.circle,
+                            ),
+                            child: Icon(
+                              isSelected ? Icons.pause : Icons.play_arrow,
+                              color: textColor,
+                              size: 20,
+                            ),
+                          ),
+                          if (isSelected)
+                            Positioned(
+                              top: 4,
+                              left: 4,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 6,
+                                  vertical: 2,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: secondaryAccent,
+                                  borderRadius: BorderRadius.circular(4),
+                                ),
+                                child: const Text(
+                                  'PLAYING',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 8,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(width: 12),
+
+                      // Video details
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              _formatVideoTitle(
+                                  video['videourl'] ?? "No Video URL"),
+                              style: TextStyle(
+                                color: textColor,
+                                fontSize: 15,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.w600,
+                              ),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                            const SizedBox(height: 4),
+
+                            // Video description
+                            Text(
+                              video['videodes'] ?? 'No description available',
+                              style: TextStyle(
+                                color: textSecondary,
+                                fontSize: 13,
+                              ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
           ),
         );
       },
     );
   }
 
-  // Helper method to build option items for bottom sheet
-  Widget _buildOptionItem({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-  }) {
-    return ListTile(
-      leading: Icon(
-        icon,
-        color: Colors.white,
-      ),
-      title: Text(
-        text,
-        style: const TextStyle(
-          color: Colors.white,
-          fontSize: 16,
-        ),
-      ),
-      onTap: onTap,
-    );
-  }
-
-  // Helper method to format video URL as a title
   String _formatVideoTitle(String url) {
-    // Extract filename from URL
     final uri = Uri.parse(url);
     final pathSegments = uri.pathSegments;
     if (pathSegments.isNotEmpty) {
       final filename = pathSegments.last;
-      // Remove extension and replace underscores/hyphens with spaces
       final nameWithoutExt = filename.split('.').first;
       return nameWithoutExt
           .replaceAll('_', ' ')
@@ -691,26 +670,5 @@ class _FunnelCourcesState extends State<FunnelCources> {
           .join(' ');
     }
     return "Video ${videos.indexOf(videos.firstWhere((v) => v['videourl'] == url, orElse: () => {})) + 1}";
-  }
-
-  // Helper method to build metadata items
-  Widget _buildMetadataItem({required IconData icon, required String text}) {
-    return Row(
-      children: [
-        Icon(
-          icon,
-          size: 14,
-          color: Colors.white.withOpacity(0.5),
-        ),
-        const SizedBox(width: 4),
-        Text(
-          text,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.white.withOpacity(0.5),
-          ),
-        ),
-      ],
-    );
   }
 }

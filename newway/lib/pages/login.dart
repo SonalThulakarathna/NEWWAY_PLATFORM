@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:newway/classes/authservice.dart';
 import 'package:newway/components/loading_page1.dart';
-
 import 'package:newway/pages/bottom_nav_bar.dart';
 import 'package:newway/pages/registerpage.dart';
 
@@ -18,6 +16,15 @@ class _LoginState extends State<Login> {
   final authservice = Authservicelog();
   final password = TextEditingController();
   bool _isLoading = false; // Loading state variable
+
+  // YouTube-style dark theme colors
+  final Color backgroundColor = const Color(0xFF0F0F0F);
+  final Color surfaceColor = const Color(0xFF1F1F1F);
+  final Color cardColor = const Color(0xFF282828);
+  final Color accentColor = const Color(0xFFFF0000); // YouTube red
+  final Color textColor = Colors.white;
+  final Color textSecondary = const Color(0xFFAAAAAA);
+  final Color dividerColor = const Color(0xFF303030);
 
   void login() async {
     setState(() {
@@ -37,7 +44,13 @@ class _LoginState extends State<Login> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e')),
+          SnackBar(
+            content: Text('Error: $e'),
+            backgroundColor: cardColor,
+            behavior: SnackBarBehavior.floating,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          ),
         );
       }
     } finally {
@@ -55,15 +68,15 @@ class _LoginState extends State<Login> {
     }
 
     return Scaffold(
-      // Use a gradient background instead of flat color
+      // Use a gradient background with YouTube dark theme colors
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF2D2D44), // Indigo
-              Color(0xFF1E1E2E), // Purple
+              backgroundColor,
+              surfaceColor,
             ],
           ),
         ),
@@ -79,7 +92,7 @@ class _LoginState extends State<Login> {
                     padding: EdgeInsets.all(16),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Colors.white.withOpacity(0.1),
+                      color: cardColor.withOpacity(0.5),
                       boxShadow: [
                         BoxShadow(
                           color: Colors.black.withOpacity(0.1),
@@ -92,7 +105,7 @@ class _LoginState extends State<Login> {
                       padding: EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.9),
+                        color: accentColor.withOpacity(0.9),
                       ),
                       child: Image.asset(
                         'lib/images/lettern.png',
@@ -106,7 +119,7 @@ class _LoginState extends State<Login> {
                   Text(
                     "Welcome back",
                     style: TextStyle(
-                      color: Colors.white,
+                      color: textColor,
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
                     ),
@@ -115,7 +128,7 @@ class _LoginState extends State<Login> {
                   Text(
                     "you've been missed",
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.8),
+                      color: textSecondary,
                       fontSize: 18,
                     ),
                   ),
@@ -125,10 +138,10 @@ class _LoginState extends State<Login> {
                   Container(
                     padding: EdgeInsets.all(24),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.1),
+                      color: cardColor.withOpacity(0.7),
                       borderRadius: BorderRadius.circular(24),
                       border: Border.all(
-                        color: Colors.white.withOpacity(0.2),
+                        color: dividerColor,
                         width: 1.5,
                       ),
                       boxShadow: [
@@ -144,10 +157,10 @@ class _LoginState extends State<Login> {
                         // Custom TextField with icon
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
+                            color: surfaceColor,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.2),
+                              color: dividerColor,
                             ),
                           ),
                           child: Row(
@@ -156,16 +169,16 @@ class _LoginState extends State<Login> {
                                 padding: const EdgeInsets.all(16.0),
                                 child: Icon(
                                   Icons.person_outline,
-                                  color: Colors.white70,
+                                  color: textSecondary,
                                 ),
                               ),
                               Expanded(
                                 child: TextField(
                                   controller: username,
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: textColor),
                                   decoration: InputDecoration(
                                     hintText: 'Username',
-                                    hintStyle: TextStyle(color: Colors.white60),
+                                    hintStyle: TextStyle(color: textSecondary),
                                     border: InputBorder.none,
                                   ),
                                 ),
@@ -178,10 +191,10 @@ class _LoginState extends State<Login> {
                         // Custom TextField with icon for password
                         Container(
                           decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.1),
+                            color: surfaceColor,
                             borderRadius: BorderRadius.circular(16),
                             border: Border.all(
-                              color: Colors.white.withOpacity(0.2),
+                              color: dividerColor,
                             ),
                           ),
                           child: Row(
@@ -190,17 +203,17 @@ class _LoginState extends State<Login> {
                                 padding: const EdgeInsets.all(16.0),
                                 child: Icon(
                                   Icons.lock_outline,
-                                  color: Colors.white70,
+                                  color: textSecondary,
                                 ),
                               ),
                               Expanded(
                                 child: TextField(
                                   controller: password,
                                   obscureText: true,
-                                  style: TextStyle(color: Colors.white),
+                                  style: TextStyle(color: textColor),
                                   decoration: InputDecoration(
                                     hintText: 'Password',
-                                    hintStyle: TextStyle(color: Colors.white60),
+                                    hintStyle: TextStyle(color: textSecondary),
                                     border: InputBorder.none,
                                   ),
                                 ),
@@ -217,7 +230,7 @@ class _LoginState extends State<Login> {
                           child: Text(
                             "Forgot Password?",
                             style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
+                              color: textSecondary,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
@@ -225,23 +238,18 @@ class _LoginState extends State<Login> {
 
                         const SizedBox(height: 24),
 
-                        // Modern sign in button with gradient
+                        // Modern sign in button with YouTube red
                         GestureDetector(
                           onTap: login,
                           child: Container(
                             width: double.infinity,
                             padding: EdgeInsets.symmetric(vertical: 16),
                             decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  Color(0xFF6366F1),
-                                  Color(0xFF8B5CF6),
-                                ],
-                              ),
+                              color: accentColor,
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color(0xFF6366F1).withOpacity(0.5),
+                                  color: accentColor.withOpacity(0.3),
                                   blurRadius: 10,
                                   offset: Offset(0, 4),
                                 ),
@@ -251,7 +259,7 @@ class _LoginState extends State<Login> {
                               child: Text(
                                 "Sign in",
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: textColor,
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
                                 ),
@@ -271,7 +279,7 @@ class _LoginState extends State<Login> {
                       Expanded(
                         child: Divider(
                           thickness: 0.5,
-                          color: Colors.white.withOpacity(0.3),
+                          color: dividerColor,
                         ),
                       ),
                       Padding(
@@ -279,7 +287,7 @@ class _LoginState extends State<Login> {
                         child: Text(
                           "Or continue with",
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
+                            color: textSecondary,
                             fontSize: 14,
                           ),
                         ),
@@ -287,7 +295,7 @@ class _LoginState extends State<Login> {
                       Expanded(
                         child: Divider(
                           thickness: 0.5,
-                          color: Colors.white.withOpacity(0.3),
+                          color: dividerColor,
                         ),
                       ),
                     ],
@@ -303,10 +311,10 @@ class _LoginState extends State<Login> {
                       Container(
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: cardColor,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: dividerColor,
                             width: 1.5,
                           ),
                         ),
@@ -320,10 +328,10 @@ class _LoginState extends State<Login> {
                       Container(
                         padding: EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: cardColor,
                           shape: BoxShape.circle,
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: dividerColor,
                             width: 1.5,
                           ),
                         ),
@@ -344,7 +352,7 @@ class _LoginState extends State<Login> {
                       Text(
                         "Not a member?",
                         style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
+                          color: textSecondary,
                           fontSize: 15,
                         ),
                       ),
@@ -359,7 +367,7 @@ class _LoginState extends State<Login> {
                         child: Text(
                           "Register now",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: accentColor,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),

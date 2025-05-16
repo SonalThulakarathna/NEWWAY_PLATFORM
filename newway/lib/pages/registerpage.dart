@@ -43,12 +43,8 @@ class _RegisterpageState extends State<Registerpage> {
       final uid = await authservice.getuserid();
       if (uid == null) throw Exception("User ID is null");
 
-      final response = await supabase.from('newwayusers').insert({
-        'full_name':
-            fullname, // Ensure it matches your Supabase table column name
-        'auth_id': uid,
-        'email': signemail
-      }).select(); // This helps check if the insertion was successful
+      final response = await supabase.from('newwayusers').insert(
+          {'full_name': fullname, 'auth_id': uid, 'email': signemail}).select();
 
       print("Insert Response: $response");
 
@@ -61,7 +57,7 @@ class _RegisterpageState extends State<Registerpage> {
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text('Error: $e')));
       }
-      print("Supabase Insert Error: $e"); // Debugging
+      print("Supabase Insert Error: $e");
     }
   }
 
@@ -87,15 +83,15 @@ class _RegisterpageState extends State<Registerpage> {
         ),
         systemOverlayStyle: SystemUiOverlayStyle.light,
       ),
-      // Gradient background
+      // Gradient background with updated dark mode colors
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Color(0xFF2D2D44), // Indigo
-              Color(0xFF1E1E2E), // Purple
+              const Color(0xFF1F1F1F), // Slightly lighter dark color
+              const Color(0xFF0F0F0F), // Dark background
             ],
           ),
         ),
@@ -401,14 +397,15 @@ class _RegisterpageState extends State<Registerpage> {
                             decoration: BoxDecoration(
                               gradient: LinearGradient(
                                 colors: [
-                                  Color(0xFF6366F1),
-                                  Color(0xFF8B5CF6),
+                                  const Color(0xFF6366F1),
+                                  const Color(0xFF8B5CF6),
                                 ],
                               ),
                               borderRadius: BorderRadius.circular(16),
                               boxShadow: [
                                 BoxShadow(
-                                  color: Color(0xFF6366F1).withOpacity(0.5),
+                                  color:
+                                      const Color(0xFF6366F1).withOpacity(0.5),
                                   blurRadius: 10,
                                   offset: Offset(0, 4),
                                 ),

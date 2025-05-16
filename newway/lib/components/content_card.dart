@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:newway/classes/card_data.dart';
-import 'package:newway/components/colors.dart';
 
 class ContentCard extends StatelessWidget {
   final Cardcontent card;
@@ -10,35 +9,62 @@ class ContentCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Dark theme colors
+    final darkBackground = const Color(0xFF121212);
+    final cardBackground = const Color(0xFF1F1F1F);
+    final surfaceColor = const Color(0xFF282828);
+    final primaryText = const Color(0xFFFFFFFF);
+    final secondaryText = const Color(0xFFAAAAAA);
+    final accentBlue = const Color(0xFF3EA6FF);
+    final dividerColor = const Color(0xFF303030);
+    final privateColor = const Color(0xFFFF5252);
+    final publicColor = const Color(0xFF4CAF50);
+    final badgeBackground = const Color(0xFF303030);
+
     return GestureDetector(
       onTap: onTap,
-      child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        shape: RoundedRectangleBorder(
+      child: Container(
+        // Reduced horizontal margin to increase card width
+        margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: cardBackground,
           borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.3),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
-        elevation: 3,
-        shadowColor: Colors.black.withOpacity(0.2),
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(
-            minWidth: double.infinity,
-          ),
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Header Image with Overlay
               Stack(
                 children: [
-                  ClipRRect(
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(16),
-                      topRight: Radius.circular(16),
+                  // Image
+                  Container(
+                    height: 180,
+                    width: double.infinity,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                        image: _getImageProvider(card.userimageurl),
+                        fit: BoxFit.cover,
+                      ),
                     ),
-                    child: Image(
-                      height: 180,
-                      image: _getImageProvider(card.userimageurl),
-                      fit: BoxFit.cover,
-                      width: double.infinity,
+                    foregroundDecoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        begin: Alignment.topCenter,
+                        end: Alignment.bottomCenter,
+                        colors: [
+                          Colors.transparent,
+                          Colors.black.withOpacity(0.5),
+                        ],
+                        stops: const [0.7, 1.0],
+                      ),
                     ),
                   ),
 
@@ -51,9 +77,16 @@ class ContentCard extends StatelessWidget {
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
                         color: card.condition == 'private'
-                            ? Colors.black.withOpacity(0.7)
-                            : Colors.green.withOpacity(0.8),
+                            ? privateColor.withOpacity(0.9)
+                            : publicColor.withOpacity(0.9),
                         borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.3),
+                            blurRadius: 4,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -61,15 +94,15 @@ class ContentCard extends StatelessWidget {
                           Icon(
                             card.condition == 'private'
                                 ? Icons.lock
-                                : Icons.done,
-                            color: Colors.white,
+                                : Icons.public,
+                            color: primaryText,
                             size: 14,
                           ),
                           const SizedBox(width: 4),
                           Text(
                             card.condition == 'private' ? 'Private' : 'Public',
-                            style: const TextStyle(
-                              color: Colors.white,
+                            style: TextStyle(
+                              color: primaryText,
                               fontSize: 12,
                               fontWeight: FontWeight.w600,
                             ),
@@ -87,22 +120,22 @@ class ContentCard extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Author Info Row
+                    // Author Info Row - Corrected placement
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Profile Image with Border
+                        // Profile Image with Border - Now properly inside the card content
                         Container(
                           decoration: BoxDecoration(
                             shape: BoxShape.circle,
                             border: Border.all(
-                              color: Colors.white,
+                              color: cardBackground,
                               width: 2,
                             ),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
+                                color: Colors.black.withOpacity(0.2),
+                                blurRadius: 6,
                                 spreadRadius: 0,
                               ),
                             ],
@@ -124,10 +157,10 @@ class ContentCard extends StatelessWidget {
                             children: [
                               Text(
                                 card.author,
-                                style: const TextStyle(
+                                style: TextStyle(
                                   fontSize: 17,
                                   fontWeight: FontWeight.bold,
-                                  color: Colors.black87,
+                                  color: primaryText,
                                   letterSpacing: -0.2,
                                 ),
                                 overflow: TextOverflow.ellipsis,
@@ -137,7 +170,7 @@ class ContentCard extends StatelessWidget {
                                 card.subtitle,
                                 style: TextStyle(
                                   fontSize: 14,
-                                  color: Colors.grey[600],
+                                  color: secondaryText,
                                   height: 1.4,
                                   letterSpacing: 0.1,
                                 ),
@@ -154,96 +187,78 @@ class ContentCard extends StatelessWidget {
 
                     // Divider
                     Divider(
-                      color: Colors.grey[200],
+                      color: dividerColor,
                       thickness: 1,
                     ),
+
+                    const SizedBox(height: 12),
 
                     // Footer Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         // Status and Members
-                        Row(
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 8,
                           children: [
                             // Status Indicator
-                            if (card.condition == 'private')
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.lock,
-                                      color: textfieldgrey,
-                                      size: 16,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Private',
-                                      style: TextStyle(
-                                        color: textfieldgrey,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                              )
-                            else
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  children: [
-                                    Icon(
-                                      Icons.done,
-                                      color: textfieldgrey,
-                                      size: 16,
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      'Public',
-                                      style: TextStyle(
-                                        color: textfieldgrey,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    )
-                                  ],
-                                ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 6),
+                              decoration: BoxDecoration(
+                                color: badgeBackground,
+                                borderRadius: BorderRadius.circular(12),
                               ),
-
-                            const SizedBox(width: 12),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Icon(
+                                    card.condition == 'private'
+                                        ? Icons.lock
+                                        : Icons.public,
+                                    color: card.condition == 'private'
+                                        ? privateColor
+                                        : publicColor,
+                                    size: 14,
+                                  ),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    card.condition == 'private'
+                                        ? 'Private'
+                                        : 'Public',
+                                    style: TextStyle(
+                                      color: secondaryText,
+                                      fontSize: 12,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  )
+                                ],
+                              ),
+                            ),
 
                             // Members Count
                             Container(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: 8, vertical: 4),
+                                  horizontal: 10, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Colors.grey[100],
+                                color: badgeBackground,
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               child: Row(
+                                mainAxisSize: MainAxisSize.min,
                                 children: [
                                   Icon(
                                     Icons.people,
-                                    size: 16,
-                                    color: Colors.grey[600],
+                                    size: 14,
+                                    color: secondaryText,
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
                                     "${card.members}",
                                     style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey[600],
+                                      fontSize: 12,
+                                      color: secondaryText,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -258,14 +273,18 @@ class ContentCard extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: Colors.blue[50],
+                            color: accentBlue.withOpacity(0.15),
                             borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: accentBlue.withOpacity(0.3),
+                              width: 1,
+                            ),
                           ),
                           child: Text(
                             "\$${card.price}",
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.blue[800],
+                              color: accentBlue,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
